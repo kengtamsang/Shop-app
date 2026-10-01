@@ -564,6 +564,262 @@
     updateDatalist();
     displayRecords();
 </script>
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบจัดการคลังวัตถุดิบและคำนวณกำไร - เก่งตามสั่ง</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    /* ซ่อน Netlify Badge ทุกกรณี */
+    div[data-netlify-deploy-id], iframe[src*="netlify"], #netlify-badge {
+      display: none !important;
+    }
+  </style>
+</head>
+<body class="bg-gray-900 text-gray-100 font-sans pb-20">
+
+  <!-- Header -->
+  <header class="bg-gray-800 border-b border-gray-700 p-4 sticky top-0 z-50">
+    <div class="max-w-md mx-auto flex justify-between items-center">
+      <h1 class="text-xl font-bold text-emerald-400"><i class="fa-solid fa-utensils mr-2"></i>เก่งตามสั่ง - สต๊อก & กำไร</h1>
+      <span class="text-xs bg-emerald-950 text-emerald-300 px-2.5 py-1 rounded-full border border-emerald-800">v7.0 (Stable)</span>
+    </div>
+  </header>
+
+  <main class="max-w-md mx-auto p-4 space-y-6">
+
+    <!-- Section 1: Dashboard ภาพรวม -->
+    <section class="bg-gray-800 p-4 rounded-2xl border border-gray-700 space-y-4">
+      <h2 class="text-lg font-semibold text-gray-200 flex items-center justify-between">
+        <span><i class="fa-solid fa-chart-pie text-emerald-400 mr-2"></i>สรุปผลประกอบการวันนี้</span>
+        <span class="text-xs text-gray-400 font-normal">01/10/2026</span>
+      </h2>
+      
+      <div class="grid grid-cols-2 gap-3">
+        <div class="bg-gray-900/60 p-3 rounded-xl border border-gray-700/50">
+          <p class="text-xs text-gray-400">ยอดขายรวม</p>
+          <p class="text-xl font-bold text-emerald-400">฿3,850</p>
+        </div>
+        <div class="bg-gray-900/60 p-3 rounded-xl border border-gray-700/50">
+          <p class="text-xs text-gray-400">ต้นทุนวัตถุดิบ</p>
+          <p class="text-xl font-bold text-rose-400">฿1,420</p>
+        </div>
+        <div class="bg-gray-900/60 p-3 rounded-xl border border-gray-700/50">
+          <p class="text-xs text-gray-400">กำไรขั้นต้น</p>
+          <p class="text-xl font-bold text-amber-400">฿2,430</p>
+        </div>
+        <div class="bg-gray-900/60 p-3 rounded-xl border border-gray-700/50">
+          <p class="text-xs text-gray-400">อัตรากำไร (Margin)</p>
+          <p class="text-xl font-bold text-blue-400">63.1%</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: ระบบแจ้งเตือนสต๊อก -->
+    <section class="bg-amber-950/30 border border-amber-800/60 p-4 rounded-2xl space-y-3">
+      <h3 class="text-sm font-semibold text-amber-300 flex items-center">
+        <i class="fa-solid fa-triangle-exclamation mr-2 animate-pulse"></i>แจ้งเตือนวัตถุดิบใกล้หมด (คำนวณจากยอดขาย)
+      </h3>
+      <div class="space-y-2">
+        <div class="bg-gray-900/80 p-2.5 rounded-xl border border-amber-900/40 flex justify-between items-center text-xs">
+          <div>
+            <p class="font-bold text-gray-200">หมูบด</p>
+            <p class="text-gray-400">เหลือ 0.8 กก. (ขายได้อีก ~10 จาน)</p>
+          </div>
+          <span class="px-2 py-1 bg-amber-500/20 text-amber-400 rounded-md font-semibold">หมดภายในวันนี้</span>
+        </div>
+        <div class="bg-gray-900/80 p-2.5 rounded-xl border border-amber-900/40 flex justify-between items-center text-xs">
+          <div>
+            <p class="font-bold text-gray-200">ใบกะเพรา</p>
+            <p class="text-gray-400">เหลือ 150 กรัม (ขายได้อีก ~7 จาน)</p>
+          </div>
+          <span class="px-2 py-1 bg-rose-500/20 text-rose-400 rounded-md font-semibold">ต้องซื้อเพิ่ม</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: คลังวัตถุดิบ (Stock Management) -->
+    <section class="bg-gray-800 p-4 rounded-2xl border border-gray-700 space-y-4">
+      <div class="flex justify-between items-center">
+        <h2 class="text-lg font-semibold text-gray-200">
+          <i class="fa-solid fa-boxes-stacked text-blue-400 mr-2"></i>จัดการสต๊อกวัตถุดิบ
+        </h2>
+        <button class="bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-1.5 rounded-lg font-medium transition">
+          + เพิ่มวัตถุดิบ
+        </button>
+      </div>
+
+      <div class="space-y-2 text-sm">
+        <!-- รายการวัตถุดิบ 1 -->
+        <div class="bg-gray-900 p-3 rounded-xl border border-gray-700/80 flex justify-between items-center">
+          <div>
+            <p class="font-bold text-gray-100">หมูบด</p>
+            <p class="text-xs text-gray-400">ต้นทุน: ฿160 / กก.</p>
+          </div>
+          <div class="text-right">
+            <p class="font-bold text-amber-400">0.80 กก.</p>
+            <div class="flex gap-1 mt-1">
+              <button class="px-2 py-0.5 bg-emerald-900/80 text-emerald-300 text-xs rounded border border-emerald-700">+ รับเข้า</button>
+              <button class="px-2 py-0.5 bg-rose-900/80 text-rose-300 text-xs rounded border border-rose-700">- ของเสีย</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- รายการวัตถุดิบ 2 -->
+        <div class="bg-gray-900 p-3 rounded-xl border border-gray-700/80 flex justify-between items-center">
+          <div>
+            <p class="font-bold text-gray-100">ข้าวหอมมะลิ</p>
+            <p class="text-xs text-gray-400">ต้นทุน: ฿35 / กก.</p>
+          </div>
+          <div class="text-right">
+            <p class="font-bold text-emerald-400">12.50 กก.</p>
+            <div class="flex gap-1 mt-1">
+              <button class="px-2 py-0.5 bg-emerald-900/80 text-emerald-300 text-xs rounded border border-emerald-700">+ รับเข้า</button>
+              <button class="px-2 py-0.5 bg-rose-900/80 text-rose-300 text-xs rounded border border-rose-700">- ของเสีย</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- รายการวัตถุดิบ 3 -->
+        <div class="bg-gray-900 p-3 rounded-xl border border-gray-700/80 flex justify-between items-center">
+          <div>
+            <p class="font-bold text-gray-100">ไข่ไก่ (เบอร์ 2)</p>
+            <p class="text-xs text-gray-400">ต้นทุน: ฿4.20 / ฟอง</p>
+          </div>
+          <div class="text-right">
+            <p class="font-bold text-emerald-400">45 ฟอง</p>
+            <div class="flex gap-1 mt-1">
+              <button class="px-2 py-0.5 bg-emerald-900/80 text-emerald-300 text-xs rounded border border-emerald-700">+ รับเข้า</button>
+              <button class="px-2 py-0.5 bg-rose-900/80 text-rose-300 text-xs rounded border border-rose-700">- ของเสีย</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 4: สูตรอาหาร & ต้นทุนอัตโนมัติ (BOM) -->
+    <section class="bg-gray-800 p-4 rounded-2xl border border-gray-700 space-y-4">
+      <div class="flex justify-between items-center">
+        <h2 class="text-lg font-semibold text-gray-200">
+          <i class="fa-solid fa-book-open text-purple-400 mr-2"></i>สูตรอาหาร & ต้นทุน/จาน
+        </h2>
+        <span class="text-xs text-purple-300 bg-purple-950 px-2 py-1 rounded-md border border-purple-800">คำนวณอัตโนมัติ</span>
+      </div>
+
+      <!-- ตัวอย่างกะเพราหมู -->
+      <div class="bg-gray-900 p-3.5 rounded-xl border border-gray-700 space-y-3">
+        <div class="flex justify-between items-start">
+          <div>
+            <h3 class="font-bold text-gray-100">ผัดกะเพราหมูสับ</h3>
+            <p class="text-xs text-gray-400">ราคาขาย: <span class="text-emerald-400 font-bold">฿60.00</span></p>
+          </div>
+          <div class="text-right">
+            <p class="text-xs text-gray-400">ต้นทุนวัตถุดิบ/จาน</p>
+            <p class="text-sm font-bold text-rose-400">฿21.90</p>
+            <p class="text-[10px] text-emerald-400">กำไร ฿38.10 (63.5%)</p>
+          </div>
+        </div>
+
+        <div class="border-t border-gray-800 pt-2 space-y-1 text-xs text-gray-300">
+          <div class="flex justify-between">
+            <span>• หมูบด (80 กรัม)</span>
+            <span class="text-gray-400">฿12.80</span>
+          </div>
+          <div class="flex justify-between">
+            <span>• ข้าวหอมมะลิ (200 กรัม)</span>
+            <span class="text-gray-400">฿7.00</span>
+          </div>
+          <div class="flex justify-between">
+            <span>• น้ำมันพืช (10 มล.)</span>
+            <span class="text-gray-400">฿0.60</span>
+          </div>
+          <div class="flex justify-between">
+            <span>• ซอสผัดปรุงรส (15 มล.)</span>
+            <span class="text-gray-400">฿0.90</span>
+          </div>
+          <div class="flex justify-between">
+            <span>• ใบกะเพรา (20 กรัม)</span>
+            <span class="text-gray-400">฿0.60</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 5: วิเคราะห์เมนูขายดี / กำไรสูง-ต่ำ -->
+    <section class="bg-gray-800 p-4 rounded-2xl border border-gray-700 space-y-3">
+      <h2 class="text-lg font-semibold text-gray-200">
+        <i class="fa-solid fa-ranking-star text-amber-400 mr-2"></i>วิเคราะห์อันดับเมนู
+      </h2>
+
+      <div class="grid grid-cols-2 gap-2 text-xs">
+        <div class="bg-gray-900 p-2.5 rounded-xl border border-gray-700">
+          <p class="text-amber-400 font-bold mb-1"><i class="fa-solid fa-fire mr-1"></i>ขายดีที่สุด</p>
+          <p class="text-gray-200 font-medium">1. กะเพราหมูสับ (42 จาน)</p>
+          <p class="text-gray-200 font-medium">2. ข้าวผัดหมู (28 จาน)</p>
+        </div>
+        <div class="bg-gray-900 p-2.5 rounded-xl border border-gray-700">
+          <p class="text-emerald-400 font-bold mb-1"><i class="fa-solid fa-money-bill-trend-up mr-1"></i>กำไรสูงสุด/จาน</p>
+          <p class="text-gray-200 font-medium">1. ข้าวไข่เจียวทรงเครื่อง (72%)</p>
+          <p class="text-gray-200 font-medium">2. กะเพราหมูสับ (63.5%)</p>
+        </div>
+      </div>
+    </section>
+        <div class="bg-gray-900 p-2.5 rounded-xl border border-gray-700">
+          <p class="text-emerald-400 font-bold mb-1"><i class="fa-solid fa-money-bill-trend-up mr-1"></i>กำไรสูงสุด/จาน</p>
+          <p class="text-gray-200 font-medium">1. ข้าวไข่เจียวทรงเครื่อง (72%)</p>
+          <p class="text-gray-200 font-medium">2. กะเพราหมูสับ (63.5%)</p>
+        </div>
+      </div>
+    </section>
+
+    
+    <section class="bg-gradient-to-br from-indigo-950/60 to-purple-950/40 border border-indigo-800/60 p-4 rounded-2xl space-y-3 mt-4">
+      <h3 class="text-sm font-semibold text-indigo-300 flex items-center justify-between">
+        <span><i class="fa-solid fa-wand-magic-sparkles mr-2 text-indigo-400"></i>AI ผู้ช่วยอัจฉริยะแนะนำธุรกิจ</span>
+        <span class="text-[10px] bg-indigo-900 text-indigo-200 px-2 py-0.5 rounded-full border border-indigo-700">Real-time Insights</span>
+      </h3>
+      <div class="space-y-2 text-xs text-gray-300">
+        <div class="bg-gray-900/80 p-3 rounded-xl border border-indigo-900/50 flex items-start space-x-2.5">
+          <i class="fa-solid fa-lightbulb text-amber-400 mt-0.5 text-sm"></i>
+          <div>
+            <p class="font-bold text-gray-200">คำแนะนำเรื่องวัตถุดิบ:</p>
+            <p class="text-gray-400 mt-0.5">หมูบดใกล้หมดและมีแนวโน้มขายดีช่วงเที่ยง แนะนำให้ซื้อเพิ่ม <span class="text-emerald-400 font-bold">2.5 กก.</span></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main> <!-- บรรทัดนี้เดิมที่มีอยู่ -->
+
+  
+  <nav class="fixed bottom-0 left-0 right-0 ...">
+  </main>
+
+  <!-- Navigation Bar ด้านล่าง -->
+  <nav class="fixed bottom-0 left-0 right-0 bg-gray-800 border-t border-gray-700 py-2 px-4 z-40">
+    <div class="max-w-md mx-auto flex justify-between items-center text-xs text-gray-400">
+      <button class="flex flex-col items-center text-emerald-400">
+        <i class="fa-solid fa-house text-base"></i>
+        <span class="mt-1">ภาพรวม</span>
+      </button>
+      <button class="flex flex-col items-center hover:text-gray-200">
+        <i class="fa-solid fa-boxes-stacked text-base"></i>
+        <span class="mt-1">สต๊อก</span>
+      </button>
+      <button class="flex flex-col items-center hover:text-gray-200">
+        <i class="fa-solid fa-book-open text-base"></i>
+        <span class="mt-1">สูตรอาหาร</span>
+      </button>
+      <button class="flex flex-col items-center hover:text-gray-200">
+        <i class="fa-solid fa-chart-line text-base"></i>
+        <span class="mt-1">รายงาน</span>
+      </button>
+    </div>
+  </nav>
 
 </body>
-</html>
+</html>    
+
