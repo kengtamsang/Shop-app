@@ -14,8 +14,12 @@
     <meta name="theme-color" content="#007bff">
     <meta name="apple-mobile-web-app-title" content="บัญชีร้าน">
 
-    <style>
-        /* แก้ไขให้ตัวอักษรในตารางทุกคอลัมน์มองเห็นชัดเจน */
+    <style>   
+        /* เพิ่มพื้นหลังให้ช่องวันที่เพื่อให้อ่านตัวหนังสือได้ชัดขึ้น */
+    input[type="date"] {
+      background-color: #f3f4f6 !important;
+    }
+ /* แก้ไขให้ตัวอักษรในตารางทุกคอลัมน์มองเห็นชัดเจน */
     table td, table th, table td span, table td font {
       color: #111827 !important; /* เปลี่ยนเป็นสีดำเข้ม */
       opacity: 1 !important;     /* ป้องกันไม่ให้จาง */    /* ทำให้ตัวอักษรในช่องเลือกวันที่มองเห็นชัดเจน */
