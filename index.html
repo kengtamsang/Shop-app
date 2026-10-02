@@ -421,68 +421,101 @@
     }
 
     function parseVoiceOrder(text) {
-      let qty = 1;
-      let unit = 'กล่อง';
-      let targetMenuName = '';
+  let qty = 1;
+  let unit = 'กล่อง';
+  let targetMenuName = '';
 
-      const cleanText = text.trim();
+  const cleanText = text.trim();
 
-      // 1. ตรวจสอบว่าเป็นการพูด "รหัสตัวเลข" หรือไม่ (เช่น พูดว่า "1" หรือ "หนึ่ง")
-      const firstWordMatch = cleanText.match(/^(\d+|หนึ่ง|สอง|สาม|สี่|ห้า|หก|เจ็ด|แปด|เก้า|สิบ)/);
-      if (firstWordMatch) {
-        const codeNum = wordToNumber(firstWordMatch[1]);
-        
-        // ค้นหาเมนูที่มีรหัสตรงกัน
-        const foundEntry = Object.entries(storeData.menuDetails).find(([name, details]) => details.code == codeNum);
-        if (foundEntry) {
-          targetMenuName = foundEntry[0];
+  // 1. ลองหาว่าตรงกับชื่อเมนูโดยตรงหรือไม่
+  const allMenuNames = Object.keys(storeData.menuDetails);
+  const matchedDirectName = allMenuNames.find(name => cleanText.includes(name));
 
-          // เช็คว่ามีพูดจำนวนต่อท้ายด้วยไหม เช่น "1 สองกล่อง" หรือ "1 สอง"
-          const restText = cleanText.replace(firstWordMatch[0], '').trim();
-          const qtyMatch = restText.match(/(\d+|หนึ่ง|สอง|สาม|สี่|ห้า|หก|เจ็ด|แปด|เก้า|สิบ)\s*(กล่อง|แก้ว|ชุด|ถุง|จาน|ขวด)?/);
-          if (qtyMatch) {
-            qty = wordToNumber(qtyMatch[1]) || 1;
-            if (qtyMatch[2]) unit = qtyMatch[2];
-          }
-        }
-      }
+  if (matchedDirectName) {
+    targetMenuName = matchedDirectName;
+    const qtyMatch = cleanText.match(/(\d+|หนึ่ง|สอง|สาม|สี่|ห้า|หก|เจ็ด|แปด|เก้า|สิบ)\s*(กล่อง|แก้ว|ชุด|ถุง|จาน|ขวด)?/);
+    if (qtyMatch) {
+      qty = wordToNumber(qtyMatch[1]) || 1;
+      if (qtyMatch[2]) unit = qtyMatch[2];
+    }
+  } else {
+    // 2. ถ้าไม่เจอชื่อตรงๆ ค่อยเช็คว่าเป็นรหัสตัวเลขหรือไม่
+    const firstWordMatch = cleanText.match(/^(\d+|หนึ่ง|สอง|สาม|สี่|ห้า|หก|เจ็ด|แปด|เก้า|สิบ)/);
+    if (firstWordMatch) {
+      const codeNum = wordToNumber(firstWordMatch[1]);
+      
+      const foundEntry = Object.entries(storeData.menuDetails).find(([name, details]) => details.code && details.code == codeNum);
+      if (foundEntry) {
+        targetMenuName = foundEntry[0];
 
-      // 2. ถ้าไม่ใช่รหัส ให้ประมวลผลคำสั่งตามชื่อเมนูปกติ
-      if (!targetMenuName) {
-        let name = cleanText;
-        const qtyMatch = cleanText.match(/(\d+|หนึ่ง|สอง|สาม|สี่|ห้า|หก|เจ็ด|แปด|เก้า|สิบ)\s*(กล่อง|แก้ว|ชุด|ถุง|จาน|ขวด|ห่อ|ถ้วย|ชาม|อัน|กระป๋อง|กก\.|กิโล)/);
+        const restText = cleanText.replace(firstWordMatch[0], '').trim();
+        const qtyMatch = restText.match(/(\d+|หนึ่ง|สอง|สาม|สี่|ห้า|หก|เจ็ด|แปด|เก้า|สิบ)\s*(กล่อง|แก้ว|ชุด|ถุง|จาน|ขวด)?/);
         if (qtyMatch) {
           qty = wordToNumber(qtyMatch[1]) || 1;
-          unit = qtyMatch[2];
+          if (qtyMatch[2]) unit = qtyMatch[2];
         }
-
-        name = name.replace(/(\d+|หนึ่ง|สอง|สาม|สี่|ห้า)\s*(กล่อง|แก้ว|ชุด|ถุง|จาน|ขวด|ห่อ|ถ้วย|ชาม|อัน|กระป๋อง|กก\.|กิโล)/g, '')
-                   .replace(/(\d+)\s*(บาท|บ)/g, '')
-                   .replace(/เอา|สั่ง|ขอ|เอาเป็น/g, '')
-                   .trim();
-
-        if (name.includes('กระเพรา')) name = name.replace('กระเพรา', 'กะเพรา');
-        targetMenuName = name;
-      }
-
-      // ใส่ค่าลงในฟอร์ม
-      document.getElementById('item-name').value = targetMenuName;
-      document.getElementById('item-qty').value = qty;
-      document.getElementById('item-unit').value = unit;
-
-      if (storeData.menuDetails[targetMenuName]) {
-        document.getElementById('item-price').value = storeData.menuDetails[targetMenuName].price;
-      } else {
-        autoFillPrice();
-      }
-
-      calculateTotal();
-
-      // บันทึกอัตโนมัติทันทีเมื่อค้นพบเมนูจากรหัส เพื่อความรวดเร็วในการขาย
-      if (storeData.menuDetails[targetMenuName] && currentTab === 'income') {
-        addRecord();
       }
     }
+  }
+
+  // 3. ถ้ายังไม่พบเมนู ให้ดึงข้อความมาเป็นชื่อรายการตามปกติ
+  if (!targetMenuName) {
+    let name = cleanText;
+    const qtyMatch = cleanText.match(/(\d+|หนึ่ง|สอง|สาม|สี่|ห้า|หก|เจ็ด|แปด|เก้า|สิบ)\s*(กล่อง|แก้ว|ชุด|ถุง|จาน|ขวด)?/);
+    if (qtyMatch) {
+      qty = wordToNumber(qtyMatch[1]) || 1;
+      if (qtyMatch[2]) unit = qtyMatch[2];
+    }
+    name = name.replace(/(\d+|หนึ่ง|สอง|สาม|สี่|ห้า)\s*(กล่อง|แก้ว|ชุด|ถุง|จาน|ขวด)?/g, '').replace(/เอา|สั่ง|ขอ/g, '').trim();
+    if (name.includes('กระเพรา')) name = name.replace('กระเพรา', 'กะเพรา');
+    targetMenuName = name;
+  }
+
+  document.getElementById('item-name').value = targetMenuName;
+  document.getElementById('item-qty').value = qty;
+  document.getElementById('item-unit').value = unit;
+
+  if (storeData.menuDetails[targetMenuName]) {
+    document.getElementById('item-price').value = storeData.menuDetails[targetMenuName].price;
+  } else {
+    autoFillPrice();
+  }
+
+  calculateTotal();
+
+  if (storeData.menuDetails[targetMenuName] && currentTab === 'income') {
+    addRecord();
+  }
+}
+function editMenuCost(oldName) {
+  const current = storeData.menuDetails[oldName];
+  if (!current) return;
+
+  const newCode = prompt('แก้ไขรหัสเมนูด่วน (เว้นว่างไว้ได้หากไม่ต้องการใช้รหัส):', current.code !== undefined ? current.code : '');
+  if (newCode === null) return;
+
+  const newName = prompt('แก้ไขชื่อเมนูอาหาร:', oldName);
+  if (!newName || newName.trim() === '') return;
+
+  const newPrice = prompt('แก้ไขราคาขายจริง (บาท):', current.price);
+  if (newPrice === null) return;
+
+  const newCost = prompt('แก้ไขราคาต้นทุนวัตถุดิบ (บาท):', current.cost);
+  if (newCost === null) return;
+
+  if (newName.trim() !== oldName) {
+    delete storeData.menuDetails[oldName];
+  }
+
+  storeData.menuDetails[newName.trim()] = {
+    code: newCode.trim() !== '' ? parseInt(newCode) : '',
+    price: parseFloat(newPrice) || 0,
+    cost: parseFloat(newCost) || 0
+  };
+
+  saveData();
+}
+
 
     function selectQuickMenu(name) {
       document.getElementById('item-name').value = name;
