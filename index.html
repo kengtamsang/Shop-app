@@ -40,7 +40,7 @@
       <h1 class="text-lg font-bold text-blue-600 flex items-center gap-2">
         <i class="fa-solid fa-utensils"></i> เก่งตามสั่ง - สต๊อก & กำไร
       </h1>
-      <span class="text-xs bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full font-semibold">v12.0 Voice Order 🎙️</span>
+      <span class="text-xs bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full font-semibold">v12.1 Voice Unit Fixed 🎙️</span>
     </header>
 
     <!-- Navigation Tabs -->
@@ -367,18 +367,31 @@
       }
     }
 
-    // ฟังก์ชันแยกข้อมูลจากคำพูดอัจฉริยะ
+    // ฟังก์ชันแยกข้อมูลจากคำพูดอัจฉริยะ (ปรับปรุงการดึงหน่วยนับ 🏷️)
     function parseVoiceOrder(text) {
       let qty = 1;
       let price = 0;
+      let unit = 'จาน'; // ตั้งค่าเริ่มต้นเป็น จาน
       let name = text;
 
-      // หาจำนวน (เช่น 2 จาน, 3 กล่อง, สองจาน)
-      const qtyMatch = text.match(/(\d+|หนึ่ง|สอง|สาม|สี่|ห้า|หก|เจ็ด|แปด|เก้า|สิบ)\s*(จาน|กล่อง|ชุด|ถุง|แก้ว)/);
+      // รายการคำค้นหาหน่วยนับ
+      const knownUnits = ['กล่อง', 'แก้ว', 'ชุด', 'ถุง', 'จาน', 'ขวด', 'ห่อ', 'ถ้วย', 'ชาม', 'อัน', 'กระป๋อง', 'กก.', 'กิโล'];
+
+      // หาจำนวน + หน่วยนับ (เช่น 2 กล่อง, 1 แก้ว, สองชุด)
+      const qtyMatch = text.match(/(\d+|หนึ่ง|สอง|สาม|สี่|ห้า|หก|เจ็ด|แปด|เก้า|สิบ)\s*(จาน|กล่อง|ชุด|ถุง|แก้ว|ขวด|ห่อ|ถ้วย|ชาม|อัน|กระป๋อง|กก\.|กิโล)/);
       if (qtyMatch) {
         const numStr = qtyMatch[1];
         const numMap = {'หนึ่ง':1, 'สอง':2, 'สาม':3, 'สี่':4, 'ห้า':5, 'หก':6, 'เจ็ด':7, 'แปด':8, 'เก้า':9, 'สิบ':10};
         qty = numMap[numStr] || parseInt(numStr) || 1;
+        unit = qtyMatch[2]; // ดึงหน่วยนับที่พูดได้ทันที
+      } else {
+        // กรณีพูดหน่วยนับโดยไม่มีตัวเลขชัดเจน
+        for (let u of knownUnits) {
+          if (text.includes(u)) {
+            unit = u;
+            break;
+          }
+        }
       }
 
       // หาบาท (เช่น 50 บาท, 60 บ.)
@@ -387,17 +400,19 @@
         price = parseFloat(priceMatch[1]);
       }
 
-      // ทำความสะอาดชื่อรายการ
-      name = name.replace(/(\d+|หนึ่ง|สอง|สาม|สี่|ห้า)\s*(จาน|กล่อง|ชุด|ถุง|แก้ว)/g, '')
+      // ทำความสะอาดชื่อรายการ (ตัดตัวเลข, หน่วยนับ, บาท ออกเพื่อเหลือแค่ชื่ออาหาร)
+      name = name.replace(/(\d+|หนึ่ง|สอง|สาม|สี่|ห้า)\s*(จาน|กล่อง|ชุด|ถุง|แก้ว|ขวด|ห่อ|ถ้วย|ชาม|อัน|กระป๋อง|กก\.|กิโล)/g, '')
                  .replace(/(\d+)\s*(บาท|บ)/g, '')
                  .replace(/เอา|สั่ง|ขอ|เอาเป็น/g, '')
                  .trim();
 
-      // เติมคำกะเพราให้ถูกสะกด
+      // แก้คำสะกดผิดยอดฮิต
       if (name.includes('กระเพรา')) name = name.replace('กระเพรา', 'กะเพรา');
 
+      // อัปเดตลงในช่องข้อมูล
       document.getElementById('item-name').value = name;
       document.getElementById('item-qty').value = qty;
+      document.getElementById('item-unit').value = unit; // 👈 แสดงหน่วยนับตามที่พูด
 
       // ค้นหาราคาจากหลังบ้านถ้าไม่ได้พูดราคามา
       if (price > 0) {
@@ -577,6 +592,7 @@
       document.getElementById('item-name').value = '';
       document.getElementById('item-price').value = '';
       document.getElementById('item-total').value = '';
+      document.getElementById('item-unit').value = 'จาน';
 
       saveData();
     }
