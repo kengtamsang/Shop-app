@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>เก่งตามสั่ง - บัญชี สต๊อก & สั่งงานด้วยเสียง</title>
+  <title>เก่งตามสั่ง - บัญชี สต๊อก & รหัสเมนูด่วนสั่งด้วยเสียง</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <style>
@@ -41,7 +41,7 @@
       <h1 class="text-lg font-bold text-blue-600 flex items-center gap-2">
         <i class="fa-solid fa-utensils"></i> เก่งตามสั่ง - สต๊อก & กำไร
       </h1>
-      <span class="text-xs bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full font-semibold">v13.0 Perfect Layout 🎙️</span>
+      <span class="text-xs bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full font-semibold">v14.0 Quick Code ⚡</span>
     </header>
 
     <!-- Navigation Tabs -->
@@ -69,9 +69,20 @@
             <i class="fa-solid fa-pen-to-square"></i> บันทึกรายการ
           </h2>
           <!-- ปุ่มไมค์ -->
-          <button id="mic-btn" onclick="toggleVoiceRecognition()" title="กดเพื่อพูดสั่งงาน" class="w-12 h-12 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 border-2 border-blue-400 flex items-center justify-center transition shadow-sm active:scale-95">
+          <button id="mic-btn" onclick="toggleVoiceRecognition()" title="กดเพื่อพูดสั่งงาน (พูดเลขเมนูได้ เช่น 1 หรือ 1 สองกล่อง)" class="w-12 h-12 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 border-2 border-blue-400 flex items-center justify-center transition shadow-sm active:scale-95">
             <i class="fa-solid fa-microphone text-xl"></i>
           </button>
+        </div>
+
+        <!-- แถบปุ่มเมนูด่วน ( Quick Code Shortcut Keys ) -->
+        <div id="quick-menu-bar" class="p-2 bg-blue-50 border border-blue-100 rounded-lg space-y-1">
+          <p class="text-[11px] font-bold text-blue-800 flex justify-between">
+            <span>⚡ รหัสเมนูด่วน (พูดเลขหรือกดปุ่มได้เลย):</span>
+            <span class="text-blue-500 font-normal">แก้ไขรหัสได้ที่หน้า⚙หลังบ้าน</span>
+          </p>
+          <div id="quick-menu-buttons" class="flex gap-1.5 overflow-x-auto pb-1 text-xs">
+            <!-- ปุ่มเมนูด่วนจะแสดงตรงนี้ -->
+          </div>
         </div>
         
         <div>
@@ -81,7 +92,7 @@
 
         <div>
           <label id="name-label" class="block text-xs font-semibold text-gray-700 mb-1">เลือก/กรอกชื่อรายการ:</label>
-          <input type="text" id="item-name" list="menu-suggestions" placeholder="พูดหรือพิมพ์ เช่น กะเพราไก่ 1 กล่อง 50 บาท" onchange="autoFillPrice()" class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs text-gray-800 focus:outline-none focus:border-blue-500">
+          <input type="text" id="item-name" list="menu-suggestions" placeholder="พูดชื่อเมนู หรือพูดรหัสเลข เช่น 1" onchange="autoFillPrice()" class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs text-gray-800 focus:outline-none focus:border-blue-500">
           <datalist id="menu-suggestions"></datalist>
         </div>
 
@@ -125,7 +136,7 @@
               </tr>
             </thead>
             <tbody id="data-table-body" class="divide-y divide-gray-100 bg-white">
-              <!-- ข้อมูลรายการจะถูกแสดงและเรียงจากใหม่ไปเก่าตรงนี้ -->
+              <!-- ข้อมูลรายการจะถูกแสดงตรงนี้ -->
             </tbody>
             <tfoot id="data-table-foot" class="bg-gray-50 font-bold border-t border-gray-200">
               <!-- ยอดสรุปประจำวันล่างสุดตาราง -->
@@ -137,7 +148,7 @@
       <!-- Section หลังบ้าน (รวมวิเคราะห์อันดับ + สรุปผลประกอบการ + ตั้งค่าเมนู) -->
       <section id="cost-section" class="space-y-4 hidden">
         
-        <!-- 1. วิเคราะห์อันดับเมนูขายดี / กำไรสูงสุด (ย้ายมาไว้ที่นี่) -->
+        <!-- 1. วิเคราะห์อันดับเมนูขายดี / กำไรสูงสุด -->
         <div id="analytics-section" class="bg-white p-4 rounded-xl border border-gray-200 space-y-3 shadow-sm">
           <h2 class="text-sm font-bold text-gray-800 flex items-center gap-2">
             <i class="fa-solid fa-ranking-star text-amber-500"></i> วิเคราะห์อันดับเมนู
@@ -158,7 +169,7 @@
           </div>
         </div>
 
-        <!-- 2. Dashboard สรุปผลประกอบการ (ย้ายมาไว้ที่นี่) -->
+        <!-- 2. Dashboard สรุปผลประกอบการ -->
         <div id="dashboard-section" class="bg-emerald-50 p-4 rounded-xl border border-emerald-200 space-y-3 shadow-sm">
           <div class="flex justify-between items-center">
             <h2 class="text-sm font-bold text-emerald-900 flex items-center gap-2">
@@ -199,16 +210,22 @@
           </div>
         </div>
 
-        <!-- 3. ตั้งค่าราคาขาย & ต้นทุนอาหาร -->
+        <!-- 3. ตั้งค่าราคาขาย & ต้นทุนอาหาร & รหัสเมนูด่วน -->
         <div class="bg-white p-4 rounded-xl border border-gray-200 space-y-4 shadow-sm">
           <h2 class="text-sm font-bold text-blue-600 flex items-center gap-2">
-            <i class="fa-solid fa-gear"></i> ตั้งค่าราคาขาย & ต้นทุนอาหาร
+            <i class="fa-solid fa-gear"></i> ตั้งค่าราคาขาย, ต้นทุน & รหัสเมนูด่วน
           </h2>
 
           <div class="space-y-3 bg-blue-50/50 p-3 rounded-lg border border-blue-100 text-xs">
-            <div>
-              <label class="block font-semibold text-gray-700 mb-1">ชื่อเมนูอาหาร:</label>
-              <input type="text" id="cost-menu-name" placeholder="เช่น กะเพราไก่" class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs text-gray-800 focus:outline-none focus:border-blue-500">
+            <div class="grid grid-cols-3 gap-2">
+              <div class="col-span-1">
+                <label class="block font-semibold text-gray-700 mb-1">รหัสสั่งสั้น:</label>
+                <input type="number" id="cost-menu-code" placeholder="เช่น 1" class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs font-bold text-blue-600 text-center focus:outline-none focus:border-blue-500">
+              </div>
+              <div class="col-span-2">
+                <label class="block font-semibold text-gray-700 mb-1">ชื่อเมนูอาหาร:</label>
+                <input type="text" id="cost-menu-name" placeholder="เช่น กะเพราไก่" class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs text-gray-800 focus:outline-none focus:border-blue-500">
+              </div>
             </div>
 
             <div class="grid grid-cols-2 gap-2">
@@ -228,20 +245,20 @@
             </div>
 
             <button onclick="saveMenuCost()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-xs transition shadow">
-              💾 บันทึกราคาเมนูนี้
+              💾 บันทึกเมนูและรหัสนี้
             </button>
           </div>
 
           <div class="space-y-2">
-            <h3 class="text-xs font-bold text-gray-700">ตารางเทียบราคาขายและต้นทุนจริง</h3>
+            <h3 class="text-xs font-bold text-gray-700">ตารางเทียบราคาขาย ต้นทุน และรหัสเมนูด่วน</h3>
             <div class="overflow-x-auto border border-gray-200 rounded-lg">
               <table class="w-full text-xs text-left">
                 <thead class="bg-gray-100 text-gray-600 border-b border-gray-200 uppercase">
                   <tr>
+                    <th class="p-2 text-center">รหัส</th>
                     <th class="p-2">ชื่อเมนู</th>
                     <th class="p-2 text-right">ราคาขาย</th>
-                    <th class="p-2 text-right">ต้นทุนจริง</th>
-                    <th class="p-2 text-right">กำไรสุทธิ</th>
+                    <th class="p-2 text-right">ต้นทุน</th>
                     <th class="p-2 text-center">จัดการ</th>
                   </tr>
                 </thead>
@@ -255,10 +272,10 @@
 
       </section>
 
-      <!-- Stock Management Section (รวมแจ้งเตือนสต๊อก + การจัดการ) -->
+      <!-- Stock Management Section -->
       <section id="stock-section" class="space-y-4 hidden">
         
-        <!-- Section แจ้งเตือนวัตถุดิบใกล้หมด (ย้ายมาไว้ที่นี่) -->
+        <!-- Section แจ้งเตือนวัตถุดิบใกล้หมด -->
         <div id="stock-alert-box" class="bg-amber-50 border border-amber-200 p-4 rounded-xl space-y-2 shadow-sm">
           <h3 class="text-xs font-bold text-amber-800 flex items-center gap-1.5">
             <i class="fa-solid fa-triangle-exclamation animate-pulse"></i> แจ้งเตือนวัตถุดิบใกล้หมด
@@ -322,13 +339,14 @@
       { id: 'cup', name: 'แก้วน้ำ', qty: 100, unit: 'ใบ', costPerUnit: 1.5, alertThreshold: 20, defaultUsage: 1 }
     ];
 
+    // เพิ่มรหัสเมนูด่วน (code) ใน defaultMenuDetails
     const defaultMenuDetails = {
-      'กะเพราไก่': { price: 50, cost: 18.00 },
-      'กะเพราหมูสับ': { price: 60, cost: 21.90 },
-      'กะเพราหมูกรอบ': { price: 70, cost: 30.00 },
-      'ข้าวผัดกุ้ง': { price: 70, cost: 28.00 },
-      'ผัดซีอิ๊วหมู': { price: 60, cost: 22.00 },
-      'สุกี้น้ำทะเล': { price: 70, cost: 32.00 }
+      'กะเพราหมูสับ': { code: 1, price: 60, cost: 21.90 },
+      'กะเพราหมูกรอบ': { code: 2, price: 70, cost: 30.00 },
+      'กะเพราทะเล': { code: 3, price: 70, cost: 32.00 },
+      'กะเพราไก่': { code: 4, price: 50, cost: 18.00 },
+      'ข้าวผัดกุ้ง': { code: 5, price: 70, cost: 28.00 },
+      'ผัดซีอิ๊วหมู': { code: 6, price: 60, cost: 22.00 }
     };
 
     let storeData = JSON.parse(localStorage.getItem('keng_store_db')) || {
@@ -345,7 +363,7 @@
       renderData();
     }
 
-    // 🎙️ ระบบสั่งงานด้วยเสียง
+    // 🎙️ ระบบสั่งงานด้วยเสียง (ปรับรองรับการพูดด้วยรหัสตัวเลข)
     let recognition = null;
     let isListening = false;
 
@@ -396,54 +414,85 @@
       }
     }
 
+    // แปลงตัวเลขคำพูดภาษาไทยเป็นตัวเลขจริง
+    function wordToNumber(str) {
+      const numMap = {'หนึ่ง':1, 'สอง':2, 'สาม':3, 'สี่':4, 'ห้า':5, 'หก':6, 'เจ็ด':7, 'แปด':8, 'เก้า':9, 'สิบ':10};
+      return numMap[str] || parseInt(str) || null;
+    }
+
     function parseVoiceOrder(text) {
       let qty = 1;
-      let price = 0;
       let unit = 'กล่อง';
-      let name = text;
+      let targetMenuName = '';
 
-      const knownUnits = ['กล่อง', 'แก้ว', 'ชุด', 'ถุง', 'จาน', 'ขวด', 'ห่อ', 'ถ้วย', 'ชาม', 'อัน', 'กระป๋อง', 'กก.', 'กิโล'];
+      const cleanText = text.trim();
 
-      const qtyMatch = text.match(/(\d+|หนึ่ง|สอง|สาม|สี่|ห้า|หก|เจ็ด|แปด|เก้า|สิบ)\s*(กล่อง|แก้ว|ชุด|ถุง|จาน|ขวด|ห่อ|ถ้วย|ชาม|อัน|กระป๋อง|กก\.|กิโล)/);
-      if (qtyMatch) {
-        const numStr = qtyMatch[1];
-        const numMap = {'หนึ่ง':1, 'สอง':2, 'สาม':3, 'สี่':4, 'ห้า':5, 'หก':6, 'เจ็ด':7, 'แปด':8, 'เก้า':9, 'สิบ':10};
-        qty = numMap[numStr] || parseInt(numStr) || 1;
-        unit = qtyMatch[2];
-      } else {
-        for (let u of knownUnits) {
-          if (text.includes(u)) {
-            unit = u;
-            break;
+      // 1. ตรวจสอบว่าเป็นการพูด "รหัสตัวเลข" หรือไม่ (เช่น พูดว่า "1" หรือ "หนึ่ง")
+      const firstWordMatch = cleanText.match(/^(\d+|หนึ่ง|สอง|สาม|สี่|ห้า|หก|เจ็ด|แปด|เก้า|สิบ)/);
+      if (firstWordMatch) {
+        const codeNum = wordToNumber(firstWordMatch[1]);
+        
+        // ค้นหาเมนูที่มีรหัสตรงกัน
+        const foundEntry = Object.entries(storeData.menuDetails).find(([name, details]) => details.code == codeNum);
+        if (foundEntry) {
+          targetMenuName = foundEntry[0];
+
+          // เช็คว่ามีพูดจำนวนต่อท้ายด้วยไหม เช่น "1 สองกล่อง" หรือ "1 สอง"
+          const restText = cleanText.replace(firstWordMatch[0], '').trim();
+          const qtyMatch = restText.match(/(\d+|หนึ่ง|สอง|สาม|สี่|ห้า|หก|เจ็ด|แปด|เก้า|สิบ)\s*(กล่อง|แก้ว|ชุด|ถุง|จาน|ขวด)?/);
+          if (qtyMatch) {
+            qty = wordToNumber(qtyMatch[1]) || 1;
+            if (qtyMatch[2]) unit = qtyMatch[2];
           }
         }
       }
 
-      const priceMatch = text.match(/(\d+)\s*(บาท|บ)/);
-      if (priceMatch) {
-        price = parseFloat(priceMatch[1]);
+      // 2. ถ้าไม่ใช่รหัส ให้ประมวลผลคำสั่งตามชื่อเมนูปกติ
+      if (!targetMenuName) {
+        let name = cleanText;
+        const qtyMatch = cleanText.match(/(\d+|หนึ่ง|สอง|สาม|สี่|ห้า|หก|เจ็ด|แปด|เก้า|สิบ)\s*(กล่อง|แก้ว|ชุด|ถุง|จาน|ขวด|ห่อ|ถ้วย|ชาม|อัน|กระป๋อง|กก\.|กิโล)/);
+        if (qtyMatch) {
+          qty = wordToNumber(qtyMatch[1]) || 1;
+          unit = qtyMatch[2];
+        }
+
+        name = name.replace(/(\d+|หนึ่ง|สอง|สาม|สี่|ห้า)\s*(กล่อง|แก้ว|ชุด|ถุง|จาน|ขวด|ห่อ|ถ้วย|ชาม|อัน|กระป๋อง|กก\.|กิโล)/g, '')
+                   .replace(/(\d+)\s*(บาท|บ)/g, '')
+                   .replace(/เอา|สั่ง|ขอ|เอาเป็น/g, '')
+                   .trim();
+
+        if (name.includes('กระเพรา')) name = name.replace('กระเพรา', 'กะเพรา');
+        targetMenuName = name;
       }
 
-      name = name.replace(/(\d+|หนึ่ง|สอง|สาม|สี่|ห้า)\s*(กล่อง|แก้ว|ชุด|ถุง|จาน|ขวด|ห่อ|ถ้วย|ชาม|อัน|กระป๋อง|กก\.|กิโล)/g, '')
-                 .replace(/(\d+)\s*(บาท|บ)/g, '')
-                 .replace(/เอา|สั่ง|ขอ|เอาเป็น/g, '')
-                 .trim();
-
-      if (name.includes('กระเพรา')) name = name.replace('กระเพรา', 'กะเพรา');
-
-      document.getElementById('item-name').value = name;
+      // ใส่ค่าลงในฟอร์ม
+      document.getElementById('item-name').value = targetMenuName;
       document.getElementById('item-qty').value = qty;
       document.getElementById('item-unit').value = unit;
 
-      if (price > 0) {
-        document.getElementById('item-price').value = price;
-      } else if (storeData.menuDetails[name]) {
-        document.getElementById('item-price').value = storeData.menuDetails[name].price;
+      if (storeData.menuDetails[targetMenuName]) {
+        document.getElementById('item-price').value = storeData.menuDetails[targetMenuName].price;
       } else {
         autoFillPrice();
       }
 
       calculateTotal();
+
+      // บันทึกอัตโนมัติทันทีเมื่อค้นพบเมนูจากรหัส เพื่อความรวดเร็วในการขาย
+      if (storeData.menuDetails[targetMenuName] && currentTab === 'income') {
+        addRecord();
+      }
+    }
+
+    function selectQuickMenu(name) {
+      document.getElementById('item-name').value = name;
+      document.getElementById('item-qty').value = 1;
+      document.getElementById('item-unit').value = 'กล่อง';
+      if (storeData.menuDetails[name]) {
+        document.getElementById('item-price').value = storeData.menuDetails[name].price;
+      }
+      calculateTotal();
+      addRecord();
     }
 
     function switchTab(tab) {
@@ -460,6 +509,7 @@
       const costSection = document.getElementById('cost-section');
       const stockSection = document.getElementById('stock-section');
       const tableSection = document.getElementById('table-section');
+      const quickMenuBar = document.getElementById('quick-menu-bar');
 
       const nameLabel = document.getElementById('name-label');
       const submitBtn = document.getElementById('submit-btn');
@@ -481,10 +531,12 @@
         tableSection.classList.remove('hidden');
 
         if (tab === 'income') {
-          nameLabel.innerText = 'เลือก/กรอกชื่อรายการอาหาร (ลูกค้าสั่ง):';
+          quickMenuBar.classList.remove('hidden');
+          nameLabel.innerText = 'เลือก/กรอกชื่อรายการอาหาร (หรือพิมพ์เลขรหัสสั่งสั้น):';
           submitBtn.innerText = '+ บันทึกรายรับ (ตัดสต๊อกอัตโนมัติ)';
           submitBtn.className = 'w-full bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold py-2.5 rounded-xl text-xs transition shadow';
         } else if (tab === 'expense') {
+          quickMenuBar.classList.add('hidden');
           nameLabel.innerText = 'ชื่อรายการซื้อของ / รายจ่ายของร้าน:';
           submitBtn.innerText = '+ บันทึกรายจ่าย';
           submitBtn.className = 'w-full bg-rose-600 hover:bg-rose-700 active:scale-95 text-white font-bold py-2.5 rounded-xl text-xs transition shadow';
@@ -495,9 +547,20 @@
     }
 
     function autoFillPrice() {
-      const name = document.getElementById('item-name').value.trim();
-      if (currentTab === 'income' && storeData.menuDetails[name]) {
-        document.getElementById('item-price').value = storeData.menuDetails[name].price;
+      const inputVal = document.getElementById('item-name').value.trim();
+      let matchedName = inputVal;
+
+      // รองรับการพิมพ์แค่รหัสลงในช่องชื่อรายการ
+      if (!isNaN(inputVal) && inputVal !== '') {
+        const found = Object.entries(storeData.menuDetails).find(([n, d]) => d.code == inputVal);
+        if (found) {
+          matchedName = found[0];
+          document.getElementById('item-name').value = matchedName;
+        }
+      }
+
+      if (currentTab === 'income' && storeData.menuDetails[matchedName]) {
+        document.getElementById('item-price').value = storeData.menuDetails[matchedName].price;
         calculateTotal();
       }
     }
@@ -517,6 +580,7 @@
     }
 
     function saveMenuCost() {
+      const code = parseInt(document.getElementById('cost-menu-code').value) || (Object.keys(storeData.menuDetails).length + 1);
       const name = document.getElementById('cost-menu-name').value.trim();
       const price = parseFloat(document.getElementById('cost-menu-price').value) || 0;
       const cost = parseFloat(document.getElementById('cost-menu-cost').value) || 0;
@@ -526,9 +590,10 @@
         return;
       }
 
-      storeData.menuDetails[name] = { price, cost };
-      alert(`บันทึกราคาและต้นทุนเมนู "${name}" เรียบร้อยแล้ว`);
+      storeData.menuDetails[name] = { code, price, cost };
+      alert(`บันทึกเมนู "${name}" (รหัส ${code}) เรียบร้อยแล้ว`);
 
+      document.getElementById('cost-menu-code').value = '';
       document.getElementById('cost-menu-name').value = '';
       document.getElementById('cost-menu-price').value = '';
       document.getElementById('cost-menu-cost').value = '';
@@ -538,7 +603,7 @@
     }
 
     function deleteMenuCost(name) {
-      if (confirm(`ต้องการลบเมนู "${name}" ออกจากหลังบ้านใช่หรือไม่?`)) {
+      if (confirm(`ต้องการลบเมนู "${name}" ออกใช่หรือไม่?`)) {
         delete storeData.menuDetails[name];
         saveData();
       }
@@ -718,7 +783,7 @@
         }
       });
 
-      // กรองตามแท็บ + เรียงลำดับจากใหม่ไปเก่า (id มากไปน้อย)
+      // กรองตามแท็บ + เรียงลำดับจากใหม่ไปเก่า
       let tabFiltered = [];
       if (currentTab === 'income') {
         tabFiltered = allFiltered.filter(r => r.type === 'income').sort((a, b) => b.id - a.id);
@@ -749,7 +814,7 @@
         tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-400">ไม่มีรายการ${currentTab === 'income' ? 'รายรับ' : 'รายจ่าย'}ในวันที่เลือก</td></tr>`;
       }
 
-      // แสดงยอดสรุปรวมท้ายตารางเฉพาะของแต่ละหน้า
+      // ยอดสรุปรวมท้ายตาราง
       if (currentTab === 'income') {
         tfoot.innerHTML = `
           <tr class="text-emerald-700 bg-emerald-50/70">
@@ -768,23 +833,39 @@
         `;
       }
 
+      // แสดงแถบปุ่มเมนูด่วน ( Quick Code Shortcuts )
+      const quickButtonsContainer = document.getElementById('quick-menu-buttons');
+      quickButtonsContainer.innerHTML = '';
+      const sortedMenusByCode = Object.entries(storeData.menuDetails).sort((a, b) => (a[1].code || 99) - (b[1].code || 99));
+
+      sortedMenusByCode.forEach(([name, details]) => {
+        const codeText = details.code ? `<span class="bg-blue-600 text-white px-1.5 py-0.5 rounded text-[10px] mr-1">${details.code}</span>` : '';
+        quickButtonsContainer.innerHTML += `
+          <button onclick="selectQuickMenu('${name}')" class="bg-white border border-blue-200 hover:bg-blue-100 text-blue-900 px-2.5 py-1 rounded-lg shrink-0 flex items-center font-medium shadow-sm active:scale-95 transition">
+            ${codeText} ${name} (${details.price}บ.)
+          </button>
+        `;
+      });
+
       // ตารางตั้งค่าเมนูหลังบ้าน
       const menuTable = document.getElementById('menu-cost-table-body');
       const datalist = document.getElementById('menu-suggestions');
       menuTable.innerHTML = '';
       datalist.innerHTML = '';
 
-      Object.entries(storeData.menuDetails).forEach(([name, details]) => {
+      sortedMenusByCode.forEach(([name, details]) => {
         const profit = details.price - details.cost;
         const margin = details.price > 0 ? ((profit / details.price) * 100).toFixed(1) : 0;
 
+        datalist.innerHTML += `<option value="${details.code || ''}"> ${name} (฿${details.price})</option>`;
         datalist.innerHTML += `<option value="${name}">`;
+
         menuTable.innerHTML += `
           <tr class="hover:bg-gray-50">
+            <td class="p-2 text-center font-bold text-blue-600 bg-blue-50/50">${details.code || '-'}</td>
             <td class="p-2 font-bold text-gray-800">${name}</td>
             <td class="p-2 text-right text-emerald-600 font-semibold">฿${details.price}</td>
             <td class="p-2 text-right text-rose-500">฿${details.cost}</td>
-            <td class="p-2 text-right text-blue-600 font-semibold">฿${profit.toFixed(1)} (${margin}%)</td>
             <td class="p-2 text-center">
               <button onclick="deleteMenuCost('${name}')" class="text-gray-400 hover:text-rose-600">❌</button>
             </td>
@@ -792,7 +873,7 @@
         `;
       });
 
-      // แจ้งเตือนวัตถุดิบใกล้หมด (แสดงในแท็บสต๊อก)
+      // แจ้งเตือนวัตถุดิบใกล้หมด
       const alertList = document.getElementById('stock-alert-list');
       alertList.innerHTML = '';
       let hasAlert = false;
@@ -854,7 +935,7 @@
         `;
       });
 
-      // คำนวณภาพรวมกำไรขาดทุน (สำหรับแท็บหลังบ้าน)
+      // คำนวณภาพรวมกำไรขาดทุน
       const netProfit = incomeSum - menuCostSum - expenseSum;
       const margin = incomeSum > 0 ? ((netProfit / incomeSum) * 100).toFixed(1) : 0;
 
@@ -869,7 +950,7 @@
       const avgDaily = (totalAllIncome / uniqueDays).toFixed(0);
       document.getElementById('avg-daily-sales').innerText = `${parseInt(avgDaily).toLocaleString()} บ. / วัน`;
 
-      // อัปเดตวิเคราะห์ขายดีที่สุดตามจริง
+      // วิเคราะห์ขายดีที่สุด
       const topSellingContainer = document.getElementById('top-selling-list');
       const sortedSelling = Object.entries(menuSalesCount).sort((a, b) => b[1] - a[1]);
       if (sortedSelling.length > 0) {
@@ -880,7 +961,7 @@
         topSellingContainer.innerHTML = '- ยังไม่มียอดขายวันนี้ -';
       }
 
-      // อัปเดตเมนูกำไรสูงสุด
+      // เมนูกำไรสูงสุด
       const topProfitContainer = document.getElementById('top-profit-list');
       const menuProfitList = Object.entries(storeData.menuDetails).map(([name, details]) => {
         const profit = details.price - details.cost;
