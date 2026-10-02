@@ -892,18 +892,18 @@ function editMenuCost(oldName) {
 
         datalist.innerHTML += `<option value="${details.code || ''}"> ${name} (฿${details.price})</option>`;
         datalist.innerHTML += `<option value="${name}">`;
-
-        <tr class="hover:bg-gray-50">
-  <td class="p-2 text-center font-bold text-blue-600 bg-blue-50/50">${details.code || '-'}</td>
-  <td class="p-2 font-bold text-gray-800">${name}</td>
-  <td class="p-2 text-right text-emerald-600 font-semibold">฿${details.price}</td>
-  <td class="p-2 text-right text-rose-500">฿${details.cost}</td>
-  <td class="p-2 text-center flex justify-center gap-2">
-    <button onclick="editMenuCost('${name}')" title="แก้ไขรายการนี้" class="text-blue-500 hover:text-blue-700">✏️</button>
-    <button onclick="deleteMenuCost('${name}')" title="ลบรายการนี้" class="text-gray-400 hover:text-rose-600">❌</button>
-  </td>
-</tr>
-      
+        menuTable.innerHTML += `
+          <tr class="hover:bg-gray-50">
+            <td class="p-2 text-center font-bold text-blue-600 bg-blue-50/50">${details.code || '-'}</td>
+            <td class="p-2 font-bold text-gray-800">${name}</td>
+            <td class="p-2 text-right text-emerald-600 font-semibold">฿${details.price}</td>
+            <td class="p-2 text-right text-rose-500">฿${details.cost}</td>
+            <td class="p-2 text-center flex justify-center gap-2">
+              <button onclick="editMenuCost('${name}')" title="แก้ไขรายการนี้" class="text-blue-500 hover:text-blue-700">✏️</button>
+              <button onclick="deleteMenuCost('${name}')" title="ลบรายการนี้" class="text-gray-400 hover:text-rose-600">❌</button>
+            </td>
+          </tr>
+        `; 
       });
 
       // แจ้งเตือนวัตถุดิบใกล้หมด
