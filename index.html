@@ -30,7 +30,7 @@
       <h1 class="text-lg font-bold text-blue-600 flex items-center gap-2">
         <i class="fa-solid fa-utensils"></i> เก่งตามสั่ง - สต๊อก & กำไร
       </h1>
-      <span class="text-xs bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full font-semibold">v9.0 Dynamic</span>
+      <span class="text-xs bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full font-semibold">v9.5 Stock Manager</span>
     </header>
 
     <!-- Navigation Tabs -->
@@ -94,7 +94,7 @@
         </button>
       </section>
 
-      <!-- Section ต้นทุนหลังบ้าน (แสดงเฉพาะเมื่อกดเลือกแท็บหลังบ้าน) -->
+      <!-- Section ต้นทุนหลังบ้าน -->
       <section id="cost-section" class="bg-white p-4 rounded-xl border border-gray-200 space-y-4 shadow-sm hidden">
         <h2 class="text-sm font-bold text-blue-600 flex items-center gap-2">
           <i class="fa-solid fa-gear"></i> ตั้งค่าราคาขาย & ต้นทุนอาหาร (หลังบ้าน)
@@ -127,7 +127,6 @@
           </button>
         </div>
 
-        <!-- ตารางรายการเมนูที่ตั้งไว้ -->
         <div class="space-y-2">
           <h3 class="text-xs font-bold text-gray-700">รายการเมนูในระบบทั้งหมด</h3>
           <div class="overflow-x-auto border border-gray-200 rounded-lg">
@@ -149,7 +148,7 @@
         </div>
       </section>
 
-      <!-- Stock Management Section (แสดงเมื่อเลือกแท็บสต๊อก) -->
+      <!-- Stock Management Section (เพิ่มปุ่มแก้ไข/ลบสต๊อก) -->
       <section id="stock-section" class="bg-white p-4 rounded-xl border border-gray-200 space-y-3 shadow-sm hidden">
         <div class="flex justify-between items-center">
           <h2 class="text-sm font-bold text-gray-800 flex items-center gap-2">
@@ -160,8 +159,8 @@
           </button>
         </div>
 
-        <div id="stock-items-list" class="space-y-2 text-xs">
-          <!-- แสดงรายการสต๊อกวัตถุดิบ -->
+        <div id="stock-items-list" class="space-y-2.5 text-xs">
+          <!-- รายการสต๊อกวัตถุดิบ -->
         </div>
       </section>
 
@@ -210,7 +209,6 @@
           <span id="sum-net-profit" class="font-bold text-xl text-blue-600">0 บ.</span>
         </div>
 
-        <!-- ยอดขายเฉลี่ยต่อวัน -->
         <div class="bg-white p-2.5 rounded-lg border border-emerald-200 flex justify-between items-center text-xs shadow-sm">
           <span class="text-gray-600"><i class="fa-solid fa-calculator text-blue-500 mr-1"></i> ยอดขายเฉลี่ยต่อวัน:</span>
           <span id="avg-daily-sales" class="font-bold text-blue-700">0 บ. / วัน</span>
@@ -274,10 +272,9 @@
       { id: 'pork', name: 'หมูบด', qty: 0.8, unit: 'กก.', costPerUnit: 160, alertThreshold: 1.0, qtyPerDish: 0.08 },
       { id: 'rice', name: 'ข้าวหอมมะลิ', qty: 12.5, unit: 'กก.', costPerUnit: 35, alertThreshold: 3.0, qtyPerDish: 0.2 },
       { id: 'egg', name: 'ไข่ไก่', qty: 45, unit: 'ฟอง', costPerUnit: 4.2, alertThreshold: 10, qtyPerDish: 1 },
-      { id: 'basil', name: 'ใบกะเพรา', qty: 0.15, unit: 'กก.', costPerUnit: 80, alertThreshold: 0.2, qtyPerDish: 0.02 }
+      { id: 'oil', name: 'น้ำมันพืช', qty: 2.0, unit: 'ลิตร', costPerUnit: 50, alertThreshold: 0.5, qtyPerDish: 0.03 }
     ];
 
-    // ข้อมูลเริ่มต้นของเมนูหลังบ้าน (ชื่อ, ราคาขาย, ราคาต้นทุน)
     const defaultMenuDetails = {
       'ผัดกะเพราหมูสับ': { price: 60, cost: 21.90 },
       'ข้าวไข่เจียว': { price: 40, cost: 12.40 }
@@ -291,6 +288,14 @@
 
     if (!storeData.menuDetails) storeData.menuDetails = defaultMenuDetails;
     if (!storeData.inventory || storeData.inventory.length === 0) storeData.inventory = defaultInventory;
+
+    // ตรวจสอบและซ่อมแซมค่า NaN หรือ undefined ในสต๊อก
+    storeData.inventory.forEach(item => {
+      if (isNaN(item.qty) || item.qty === null || item.qty === undefined) item.qty = 0;
+      if (isNaN(item.costPerUnit) || item.costPerUnit === null || item.costPerUnit === undefined) item.costPerUnit = 0;
+      if (isNaN(item.alertThreshold) || item.alertThreshold === null || item.alertThreshold === undefined) item.alertThreshold = 1.0;
+      if (isNaN(item.qtyPerDish) || item.qtyPerDish === null || item.qtyPerDish === undefined) item.qtyPerDish = 0.1;
+    });
 
     function saveData() {
       localStorage.setItem('keng_store_db', JSON.stringify(storeData));
@@ -452,6 +457,40 @@
       saveData();
     }
 
+    // ฟังก์ชันแก้ไขข้อมูลวัตถุดิบในสต๊อก (รวมราคาต้นทุนที่เปลี่ยนแต่ละวัน)
+    function editMaterial(id) {
+      const item = storeData.inventory.find(i => i.id === id);
+      if (!item) return;
+
+      const newName = prompt('แก้ไขชื่อวัตถุดิบ:', item.name);
+      if (newName === null) return;
+
+      const newCost = prompt('แก้ไขต้นทุนต่อหน่วย (บาท):', item.costPerUnit || 0);
+      if (newCost === null) return;
+
+      const newQty = prompt('แก้ไขจำนวนคงเหลือปัจจุบัน:', item.qty || 0);
+      if (newQty === null) return;
+
+      const newUnit = prompt('แก้ไขหน่วยนับ:', item.unit || 'กก.');
+      if (newUnit === null) return;
+
+      item.name = newName.trim() || item.name;
+      item.costPerUnit = parseFloat(newCost) || 0;
+      item.qty = parseFloat(newQty) || 0;
+      item.unit = newUnit.trim() || item.unit;
+
+      saveData();
+    }
+
+    // ฟังก์ชันลบวัตถุดิบออกจากสต๊อก
+    function deleteMaterial(id) {
+      const item = storeData.inventory.find(i => i.id === id);
+      if (item && confirm(`ต้องการลบวัตถุดิบ "${item.name}" ออกจากสต๊อกใช่หรือไม่?`)) {
+        storeData.inventory = storeData.inventory.filter(i => i.id !== id);
+        saveData();
+      }
+    }
+
     function deleteRecord(id) {
       if (confirm('ต้องการลบรายการนี้ใช่หรือไม่?')) {
         storeData.records = storeData.records.filter(r => r.id !== id);
@@ -531,16 +570,20 @@
       let hasAlert = false;
 
       storeData.inventory.forEach(item => {
-        if (item.qty <= item.alertThreshold) {
+        const safeQty = item.qty || 0;
+        const safeThreshold = item.alertThreshold || 1.0;
+        const safeQtyPerDish = item.qtyPerDish || 0.1;
+
+        if (safeQty <= safeThreshold) {
           hasAlert = true;
-          const dishesLeft = Math.floor(item.qty / item.qtyPerDish);
+          const dishesLeft = Math.floor(safeQty / safeQtyPerDish);
           const isCritical = dishesLeft < 8;
           
           alertList.innerHTML += `
             <div class="bg-white p-2.5 rounded-lg border border-amber-200 flex justify-between items-center text-xs shadow-sm">
               <div>
                 <p class="font-bold text-gray-800">${item.name}</p>
-                <p class="text-gray-500">เหลือ ${item.qty.toFixed(2)} ${item.unit} (ขายได้อีก ~${dishesLeft} จาน)</p>
+                <p class="text-gray-500">เหลือ ${safeQty.toFixed(2)} ${item.unit} (ขายได้อีก ~${dishesLeft} จาน)</p>
               </div>
               <span class="px-2 py-1 ${isCritical ? 'bg-rose-100 text-rose-700 border border-rose-200' : 'bg-amber-100 text-amber-800 border border-amber-200'} rounded font-bold text-[11px]">
                 ${isCritical ? 'ต้องซื้อเพิ่ม' : 'หมดภายในวันนี้'}
@@ -552,20 +595,27 @@
 
       document.getElementById('stock-alert-box').style.display = hasAlert ? 'block' : 'none';
 
-      // แสดงรายการสต๊อกวัตถุดิบ
+      // แสดงรายการสต๊อกวัตถุดิบ (พร้อมปุ่มแก้ไข/ลบ)
       const stockList = document.getElementById('stock-items-list');
       stockList.innerHTML = '';
 
       storeData.inventory.forEach(item => {
+        const safeQty = item.qty || 0;
+        const safeCost = item.costPerUnit || 0;
+
         stockList.innerHTML += `
           <div class="bg-gray-50 p-3 rounded-lg border border-gray-200 flex justify-between items-center">
             <div>
-              <p class="font-bold text-gray-800">${item.name}</p>
-              <p class="text-xs text-gray-500">ต้นทุน: ฿${item.costPerUnit} / ${item.unit}</p>
+              <div class="flex items-center gap-1.5">
+                <p class="font-bold text-gray-800">${item.name}</p>
+                <button onclick="editMaterial('${item.id}')" title="แก้ไข" class="text-xs text-blue-500 hover:text-blue-700">✏️</button>
+                <button onclick="deleteMaterial('${item.id}')" title="ลบ" class="text-xs text-gray-400 hover:text-rose-600">❌</button>
+              </div>
+              <p class="text-xs text-gray-500">ต้นทุน: ฿${safeCost} / ${item.unit}</p>
             </div>
             <div class="text-right">
-              <p class="font-bold ${item.qty <= item.alertThreshold ? 'text-amber-600' : 'text-emerald-600'}">
-                ${item.qty.toFixed(2)} ${item.unit}
+              <p class="font-bold ${safeQty <= (item.alertThreshold || 1) ? 'text-amber-600' : 'text-emerald-600'}">
+                ${safeQty.toFixed(2)} ${item.unit}
               </p>
               <div class="flex gap-1 mt-1">
                 <button onclick="updateStock('${item.id}', 1)" class="px-2 py-0.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs rounded font-medium">+ รับเข้า</button>
