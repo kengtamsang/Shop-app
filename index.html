@@ -41,7 +41,7 @@
       <h1 class="text-lg font-bold text-blue-600 flex items-center gap-2">
         <i class="fa-solid fa-utensils"></i> เก่งตามสั่ง - สต๊อก & กำไร
       </h1>
-      <span class="text-xs bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full font-semibold">v12.3 Clean & Smart 🎙️</span>
+      <span class="text-xs bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full font-semibold">v13.0 Perfect Layout 🎙️</span>
     </header>
 
     <!-- Navigation Tabs -->
@@ -53,7 +53,7 @@
         <span>💸 รายจ่าย</span>
       </button>
       <button onclick="switchTab('cost')" id="tab-cost" class="tab-btn bg-white text-gray-700 border border-gray-200 py-2 rounded-lg flex flex-col items-center justify-center transition">
-        <span>⚙️️ หลังบ้าน</span>
+        <span>⚙ หลังบ้าน</span>
       </button>
       <button onclick="switchTab('stock')" id="tab-stock" class="tab-btn bg-white text-gray-700 border border-gray-200 py-2 rounded-lg flex flex-col items-center justify-center transition">
         <span>📦 สต๊อก</span>
@@ -68,7 +68,7 @@
           <h2 id="form-title" class="text-sm font-bold text-blue-600 flex items-center gap-2">
             <i class="fa-solid fa-pen-to-square"></i> บันทึกรายการ
           </h2>
-          <!-- ปุ่มไมค์รูปใหญ่เดี่ยวๆ -->
+          <!-- ปุ่มไมค์ -->
           <button id="mic-btn" onclick="toggleVoiceRecognition()" title="กดเพื่อพูดสั่งงาน" class="w-12 h-12 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 border-2 border-blue-400 flex items-center justify-center transition shadow-sm active:scale-95">
             <i class="fa-solid fa-microphone text-xl"></i>
           </button>
@@ -76,7 +76,7 @@
         
         <div>
           <label class="block text-xs font-semibold text-gray-700 mb-1">วันที่ทำรายการ:</label>
-          <input type="date" id="record-date" class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs text-gray-800 focus:outline-none focus:border-blue-500">
+          <input type="date" id="record-date" onchange="syncFilterDate()" class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs text-gray-800 focus:outline-none focus:border-blue-500">
         </div>
 
         <div>
@@ -110,149 +110,7 @@
         </button>
       </section>
 
-      <!-- Section ต้นทุนหลังบ้าน -->
-      <section id="cost-section" class="bg-white p-4 rounded-xl border border-gray-200 space-y-4 shadow-sm hidden">
-        <h2 class="text-sm font-bold text-blue-600 flex items-center gap-2">
-          <i class="fa-solid fa-gear"></i> ตั้งค่าราคาขาย & ต้นทุนอาหาร (หลังบ้าน)
-        </h2>
-
-        <div class="space-y-3 bg-blue-50/50 p-3 rounded-lg border border-blue-100 text-xs">
-          <div>
-            <label class="block font-semibold text-gray-700 mb-1">ชื่อเมนูอาหาร:</label>
-            <input type="text" id="cost-menu-name" placeholder="เช่น กะเพราไก่" class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs text-gray-800 focus:outline-none focus:border-blue-500">
-          </div>
-
-          <div class="grid grid-cols-2 gap-2">
-            <div>
-              <label class="block font-semibold text-gray-700 mb-1">ราคาขายจริง (บาท):</label>
-              <input type="number" id="cost-menu-price" placeholder="50" oninput="calculateMenuProfit()" class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs text-gray-800 focus:outline-none focus:border-blue-500">
-            </div>
-            <div>
-              <label class="block font-semibold text-gray-700 mb-1">ราคาต้นทุนวัตถุดิบ (บาท):</label>
-              <input type="number" id="cost-menu-cost" placeholder="20" oninput="calculateMenuProfit()" class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs text-gray-800 focus:outline-none focus:border-blue-500">
-            </div>
-          </div>
-
-          <div class="flex justify-between items-center bg-white p-2 rounded-lg border border-gray-200 font-semibold text-gray-700">
-            <span>กำไรคาดการณ์/กล่อง:</span>
-            <span id="cost-preview-profit" class="text-emerald-600">0 บ. (0%)</span>
-          </div>
-
-          <button onclick="saveMenuCost()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-xs transition shadow">
-            💾 บันทึกราคาเมนูนี้
-          </button>
-        </div>
-
-        <div class="space-y-2">
-          <h3 class="text-xs font-bold text-gray-700">ตารางเทียบราคาขายและต้นทุนจริง (หลังบ้าน)</h3>
-          <div class="overflow-x-auto border border-gray-200 rounded-lg">
-            <table class="w-full text-xs text-left">
-              <thead class="bg-gray-100 text-gray-600 border-b border-gray-200 uppercase">
-                <tr>
-                  <th class="p-2">ชื่อเมนู</th>
-                  <th class="p-2 text-right">ราคาขาย</th>
-                  <th class="p-2 text-right">ต้นทุนจริง</th>
-                  <th class="p-2 text-right">กำไรสุทธิ</th>
-                  <th class="p-2 text-center">จัดการ</th>
-                </tr>
-              </thead>
-              <tbody id="menu-cost-table-body" class="divide-y divide-gray-100 bg-white">
-                <!-- ข้อมูลเมนูราคาจริง vs ต้นทุนจะแสดงตรงนี้ -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- Stock Management Section -->
-      <section id="stock-section" class="bg-white p-4 rounded-xl border border-gray-200 space-y-3 shadow-sm hidden">
-        <div class="flex justify-between items-center">
-          <h2 class="text-sm font-bold text-gray-800 flex items-center gap-2">
-            <i class="fa-solid fa-boxes-stacked text-blue-500"></i> จัดการสต๊อกวัตถุดิบ
-          </h2>
-          <button onclick="addNewMaterial()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded-lg transition font-semibold">
-            + เพิ่มวัตถุดิบ
-          </button>
-        </div>
-
-        <div id="stock-items-list" class="space-y-2.5 text-xs">
-          <!-- รายการสต๊อกวัตถุดิบ -->
-        </div>
-      </section>
-
-      <!-- Section แจ้งเตือนวัตถุดิบใกล้หมด -->
-      <section id="stock-alert-box" class="bg-amber-50 border border-amber-200 p-4 rounded-xl space-y-2 shadow-sm">
-        <h3 class="text-xs font-bold text-amber-800 flex items-center gap-1.5">
-          <i class="fa-solid fa-triangle-exclamation animate-pulse"></i> แจ้งเตือนวัตถุดิบใกล้หมด
-        </h3>
-        <div id="stock-alert-list" class="space-y-2 text-xs">
-          <!-- แจ้งเตือนวัตถุดิบจาก JS -->
-        </div>
-      </section>
-
-      <!-- Dashboard สรุปผลการดำเนินงาน -->
-      <section id="dashboard-section" class="bg-emerald-50 p-4 rounded-xl border border-emerald-200 space-y-3 shadow-sm">
-        <div class="flex justify-between items-center">
-          <h2 class="text-sm font-bold text-emerald-900 flex items-center gap-2">
-            <i class="fa-solid fa-chart-pie text-emerald-600"></i> สรุปผลประกอบการ
-          </h2>
-          <input type="date" id="filter-date" onchange="renderData()" class="bg-white border border-emerald-300 rounded-lg p-1 text-xs text-gray-700">
-        </div>
-
-        <div class="grid grid-cols-2 gap-2.5 text-xs">
-          <div class="bg-white p-3 rounded-lg border border-emerald-100 shadow-sm">
-            <p class="text-gray-500 text-[11px]">ยอดขายรวม (รายรับ)</p>
-            <p id="sum-income" class="text-lg font-bold text-emerald-600">0 บ.</p>
-          </div>
-          <div class="bg-white p-3 rounded-lg border border-emerald-100 shadow-sm">
-            <p class="text-gray-500 text-[11px]">ต้นทุนวัตถุดิบ (หลังบ้าน)</p>
-            <p id="sum-menu-cost" class="text-lg font-bold text-rose-500">0 บ.</p>
-          </div>
-          <div class="bg-white p-3 rounded-lg border border-emerald-100 shadow-sm">
-            <p class="text-gray-500 text-[11px]">รายจ่ายซื้อของ/ค่าใช้จ่ายร้าน</p>
-            <p id="sum-expense" class="text-lg font-bold text-rose-500">0 บ.</p>
-          </div>
-          <div class="bg-white p-3 rounded-lg border border-emerald-100 shadow-sm">
-            <p class="text-gray-500 text-[11px]">อัตรากำไร (Margin)</p>
-            <p id="sum-margin" class="text-lg font-bold text-blue-600">0%</p>
-          </div>
-        </div>
-
-        <hr class="border-emerald-200">
-
-        <div class="flex justify-between items-center pt-1">
-          <span class="font-bold text-sm text-gray-800">กำไรสุทธิ (Net Profit):</span>
-          <span id="sum-net-profit" class="font-bold text-xl text-blue-600">0 บ.</span>
-        </div>
-
-        <div class="bg-white p-2.5 rounded-lg border border-emerald-200 flex justify-between items-center text-xs shadow-sm">
-          <span class="text-gray-600"><i class="fa-solid fa-calculator text-blue-500 mr-1"></i> ยอดขายเฉลี่ยต่อวัน:</span>
-          <span id="avg-daily-sales" class="font-bold text-blue-700">0 บ. / วัน</span>
-        </div>
-      </section>
-
-      <!-- Section วิเคราะห์อันดับเมนูขายดี / กำไรสูงสุด -->
-      <section id="analytics-section" class="bg-white p-4 rounded-xl border border-gray-200 space-y-3 shadow-sm">
-        <h2 class="text-sm font-bold text-gray-800 flex items-center gap-2">
-          <i class="fa-solid fa-ranking-star text-amber-500"></i> วิเคราะห์อันดับเมนู
-        </h2>
-        <div class="grid grid-cols-2 gap-2 text-xs">
-          <div class="bg-amber-50/60 p-2.5 rounded-lg border border-amber-200">
-            <p class="text-amber-800 font-bold mb-1.5"><i class="fa-solid fa-fire mr-1 text-amber-500"></i>ขายดีที่สุด</p>
-            <div id="top-selling-list" class="text-gray-700 space-y-1 text-[11px]">
-              - ยังไม่มีข้อมูล -
-            </div>
-          </div>
-          <div class="bg-emerald-50/60 p-2.5 rounded-lg border border-emerald-200">
-            <p class="text-emerald-800 font-bold mb-1.5"><i class="fa-solid fa-money-bill-trend-up mr-1 text-emerald-500"></i>กำไรสูงสุด/กล่อง</p>
-            <div id="top-profit-list" class="text-gray-700 space-y-1 text-[11px]">
-              - ยังไม่มีข้อมูล -
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Table Section ตารางรวมรายการประจำวัน (แยกช่องตามแท็บ) -->
+      <!-- Table Section ตารางรวมรายการประจำวัน (สำหรับ รายรับ/รายจ่าย) -->
       <section id="table-section" class="space-y-2">
         <h3 id="table-title" class="text-xs font-bold text-gray-700">ตารางบันทึกรายการประจำวัน</h3>
         <div class="overflow-x-auto border border-gray-200 rounded-xl bg-white shadow-sm">
@@ -267,9 +125,162 @@
               </tr>
             </thead>
             <tbody id="data-table-body" class="divide-y divide-gray-100 bg-white">
-              <!-- ข้อมูลจะแสดงแยกตามประเภทแท็บตรงนี้ -->
+              <!-- ข้อมูลรายการจะถูกแสดงและเรียงจากใหม่ไปเก่าตรงนี้ -->
             </tbody>
+            <tfoot id="data-table-foot" class="bg-gray-50 font-bold border-t border-gray-200">
+              <!-- ยอดสรุปประจำวันล่างสุดตาราง -->
+            </tfoot>
           </table>
+        </div>
+      </section>
+
+      <!-- Section หลังบ้าน (รวมวิเคราะห์อันดับ + สรุปผลประกอบการ + ตั้งค่าเมนู) -->
+      <section id="cost-section" class="space-y-4 hidden">
+        
+        <!-- 1. วิเคราะห์อันดับเมนูขายดี / กำไรสูงสุด (ย้ายมาไว้ที่นี่) -->
+        <div id="analytics-section" class="bg-white p-4 rounded-xl border border-gray-200 space-y-3 shadow-sm">
+          <h2 class="text-sm font-bold text-gray-800 flex items-center gap-2">
+            <i class="fa-solid fa-ranking-star text-amber-500"></i> วิเคราะห์อันดับเมนู
+          </h2>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div class="bg-amber-50/60 p-2.5 rounded-lg border border-amber-200">
+              <p class="text-amber-800 font-bold mb-1.5"><i class="fa-solid fa-fire mr-1 text-amber-500"></i>ขายดีที่สุด</p>
+              <div id="top-selling-list" class="text-gray-700 space-y-1 text-[11px]">
+                - ยังไม่มีข้อมูล -
+              </div>
+            </div>
+            <div class="bg-emerald-50/60 p-2.5 rounded-lg border border-emerald-200">
+              <p class="text-emerald-800 font-bold mb-1.5"><i class="fa-solid fa-money-bill-trend-up mr-1 text-emerald-500"></i>กำไรสูงสุด/กล่อง</p>
+              <div id="top-profit-list" class="text-gray-700 space-y-1 text-[11px]">
+                - ยังไม่มีข้อมูล -
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Dashboard สรุปผลประกอบการ (ย้ายมาไว้ที่นี่) -->
+        <div id="dashboard-section" class="bg-emerald-50 p-4 rounded-xl border border-emerald-200 space-y-3 shadow-sm">
+          <div class="flex justify-between items-center">
+            <h2 class="text-sm font-bold text-emerald-900 flex items-center gap-2">
+              <i class="fa-solid fa-chart-pie text-emerald-600"></i> สรุปผลประกอบการ
+            </h2>
+            <input type="date" id="filter-date" onchange="syncRecordDate()" class="bg-white border border-emerald-300 rounded-lg p-1 text-xs text-gray-700">
+          </div>
+
+          <div class="grid grid-cols-2 gap-2.5 text-xs">
+            <div class="bg-white p-3 rounded-lg border border-emerald-100 shadow-sm">
+              <p class="text-gray-500 text-[11px]">ยอดขายรวม (รายรับ)</p>
+              <p id="sum-income" class="text-lg font-bold text-emerald-600">0 บ.</p>
+            </div>
+            <div class="bg-white p-3 rounded-lg border border-emerald-100 shadow-sm">
+              <p class="text-gray-500 text-[11px]">ต้นทุนวัตถุดิบ (หลังบ้าน)</p>
+              <p id="sum-menu-cost" class="text-lg font-bold text-rose-500">0 บ.</p>
+            </div>
+            <div class="bg-white p-3 rounded-lg border border-emerald-100 shadow-sm">
+              <p class="text-gray-500 text-[11px]">รายจ่ายซื้อของ/ค่าใช้จ่ายร้าน</p>
+              <p id="sum-expense" class="text-lg font-bold text-rose-500">0 บ.</p>
+            </div>
+            <div class="bg-white p-3 rounded-lg border border-emerald-100 shadow-sm">
+              <p class="text-gray-500 text-[11px]">อัตรากำไร (Margin)</p>
+              <p id="sum-margin" class="text-lg font-bold text-blue-600">0%</p>
+            </div>
+          </div>
+
+          <hr class="border-emerald-200">
+
+          <div class="flex justify-between items-center pt-1">
+            <span class="font-bold text-sm text-gray-800">กำไรสุทธิ (Net Profit):</span>
+            <span id="sum-net-profit" class="font-bold text-xl text-blue-600">0 บ.</span>
+          </div>
+
+          <div class="bg-white p-2.5 rounded-lg border border-emerald-200 flex justify-between items-center text-xs shadow-sm">
+            <span class="text-gray-600"><i class="fa-solid fa-calculator text-blue-500 mr-1"></i> ยอดขายเฉลี่ยต่อวัน:</span>
+            <span id="avg-daily-sales" class="font-bold text-blue-700">0 บ. / วัน</span>
+          </div>
+        </div>
+
+        <!-- 3. ตั้งค่าราคาขาย & ต้นทุนอาหาร -->
+        <div class="bg-white p-4 rounded-xl border border-gray-200 space-y-4 shadow-sm">
+          <h2 class="text-sm font-bold text-blue-600 flex items-center gap-2">
+            <i class="fa-solid fa-gear"></i> ตั้งค่าราคาขาย & ต้นทุนอาหาร
+          </h2>
+
+          <div class="space-y-3 bg-blue-50/50 p-3 rounded-lg border border-blue-100 text-xs">
+            <div>
+              <label class="block font-semibold text-gray-700 mb-1">ชื่อเมนูอาหาร:</label>
+              <input type="text" id="cost-menu-name" placeholder="เช่น กะเพราไก่" class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs text-gray-800 focus:outline-none focus:border-blue-500">
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block font-semibold text-gray-700 mb-1">ราคาขายจริง (บาท):</label>
+                <input type="number" id="cost-menu-price" placeholder="50" oninput="calculateMenuProfit()" class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs text-gray-800 focus:outline-none focus:border-blue-500">
+              </div>
+              <div>
+                <label class="block font-semibold text-gray-700 mb-1">ราคาต้นทุนวัตถุดิบ (บาท):</label>
+                <input type="number" id="cost-menu-cost" placeholder="20" oninput="calculateMenuProfit()" class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs text-gray-800 focus:outline-none focus:border-blue-500">
+              </div>
+            </div>
+
+            <div class="flex justify-between items-center bg-white p-2 rounded-lg border border-gray-200 font-semibold text-gray-700">
+              <span>กำไรคาดการณ์/กล่อง:</span>
+              <span id="cost-preview-profit" class="text-emerald-600">0 บ. (0%)</span>
+            </div>
+
+            <button onclick="saveMenuCost()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-xs transition shadow">
+              💾 บันทึกราคาเมนูนี้
+            </button>
+          </div>
+
+          <div class="space-y-2">
+            <h3 class="text-xs font-bold text-gray-700">ตารางเทียบราคาขายและต้นทุนจริง</h3>
+            <div class="overflow-x-auto border border-gray-200 rounded-lg">
+              <table class="w-full text-xs text-left">
+                <thead class="bg-gray-100 text-gray-600 border-b border-gray-200 uppercase">
+                  <tr>
+                    <th class="p-2">ชื่อเมนู</th>
+                    <th class="p-2 text-right">ราคาขาย</th>
+                    <th class="p-2 text-right">ต้นทุนจริง</th>
+                    <th class="p-2 text-right">กำไรสุทธิ</th>
+                    <th class="p-2 text-center">จัดการ</th>
+                  </tr>
+                </thead>
+                <tbody id="menu-cost-table-body" class="divide-y divide-gray-100 bg-white">
+                  <!-- รายการเมนูจะแสดงที่นี่ -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- Stock Management Section (รวมแจ้งเตือนสต๊อก + การจัดการ) -->
+      <section id="stock-section" class="space-y-4 hidden">
+        
+        <!-- Section แจ้งเตือนวัตถุดิบใกล้หมด (ย้ายมาไว้ที่นี่) -->
+        <div id="stock-alert-box" class="bg-amber-50 border border-amber-200 p-4 rounded-xl space-y-2 shadow-sm">
+          <h3 class="text-xs font-bold text-amber-800 flex items-center gap-1.5">
+            <i class="fa-solid fa-triangle-exclamation animate-pulse"></i> แจ้งเตือนวัตถุดิบใกล้หมด
+          </h3>
+          <div id="stock-alert-list" class="space-y-2 text-xs">
+            <!-- แจ้งเตือนวัตถุดิบจาก JS -->
+          </div>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl border border-gray-200 space-y-3 shadow-sm">
+          <div class="flex justify-between items-center">
+            <h2 class="text-sm font-bold text-gray-800 flex items-center gap-2">
+              <i class="fa-solid fa-boxes-stacked text-blue-500"></i> จัดการสต๊อกวัตถุดิบ
+            </h2>
+            <button onclick="addNewMaterial()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded-lg transition font-semibold">
+              + เพิ่มวัตถุดิบ
+            </button>
+          </div>
+
+          <div id="stock-items-list" class="space-y-2.5 text-xs">
+            <!-- รายการสต๊อกวัตถุดิบ -->
+          </div>
         </div>
       </section>
 
@@ -282,6 +293,16 @@
     
     document.getElementById('record-date').value = todayStr;
     document.getElementById('filter-date').value = todayStr;
+
+    function syncFilterDate() {
+      document.getElementById('filter-date').value = document.getElementById('record-date').value;
+      renderData();
+    }
+
+    function syncRecordDate() {
+      document.getElementById('record-date').value = document.getElementById('filter-date').value;
+      renderData();
+    }
 
     // คลังวัตถุดิบตั้งต้น
     const defaultInventory = [
@@ -324,7 +345,7 @@
       renderData();
     }
 
-    // 🎙️ ระบบไมค์ปรับปรุงใหม่ (ไม่ค้าง + เสถียรที่สุด)
+    // 🎙️ ระบบสั่งงานด้วยเสียง
     let recognition = null;
     let isListening = false;
 
@@ -332,7 +353,7 @@
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       recognition = new SpeechRecognition();
       recognition.lang = 'th-TH';
-      recognition.continuous = false; // เมื่อพูดจบประโยคจะประมวลผลทันทีไม่ค้าง
+      recognition.continuous = false;
       recognition.interimResults = false;
 
       recognition.onstart = function() {
@@ -375,11 +396,10 @@
       }
     }
 
-    // ฟังก์ชันแยกข้อมูลจากคำพูด (หน่วยนับตั้งต้นเป็น กล่อง 📦)
     function parseVoiceOrder(text) {
       let qty = 1;
       let price = 0;
-      let unit = 'กล่อง'; // ค่าเริ่มต้นเป็น กล่อง
+      let unit = 'กล่อง';
       let name = text;
 
       const knownUnits = ['กล่อง', 'แก้ว', 'ชุด', 'ถุง', 'จาน', 'ขวด', 'ห่อ', 'ถ้วย', 'ชาม', 'อัน', 'กระป๋อง', 'กก.', 'กิโล'];
@@ -426,7 +446,6 @@
       calculateTotal();
     }
 
-    // สลับแท็บและแยกความจำแนกในแต่ละหน้าอย่างชัดเจน
     function switchTab(tab) {
       currentTab = tab;
       document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -440,34 +459,25 @@
       const formSection = document.getElementById('form-section');
       const costSection = document.getElementById('cost-section');
       const stockSection = document.getElementById('stock-section');
-      const dashboardSection = document.getElementById('dashboard-section');
-      const analyticsSection = document.getElementById('analytics-section');
       const tableSection = document.getElementById('table-section');
 
       const nameLabel = document.getElementById('name-label');
       const submitBtn = document.getElementById('submit-btn');
 
-      // ซ่อน/แสดงตามบริบทของช่องนั้นๆ ไม่ให้ปะปน
       if (tab === 'cost') {
         formSection.classList.add('hidden');
         costSection.classList.remove('hidden');
         stockSection.classList.add('hidden');
-        dashboardSection.classList.add('hidden');
-        analyticsSection.classList.add('hidden');
-        tableSection.classList.add('hidden'); // ซ่อนตารางปกติในหน้าหลังบ้าน
+        tableSection.classList.add('hidden');
       } else if (tab === 'stock') {
         formSection.classList.add('hidden');
         costSection.classList.add('hidden');
         stockSection.classList.remove('hidden');
-        dashboardSection.classList.add('hidden');
-        analyticsSection.classList.add('hidden');
         tableSection.classList.add('hidden');
       } else {
         formSection.classList.remove('hidden');
         costSection.classList.add('hidden');
         stockSection.classList.add('hidden');
-        dashboardSection.classList.remove('hidden');
-        analyticsSection.classList.remove('hidden');
         tableSection.classList.remove('hidden');
 
         if (tab === 'income') {
@@ -611,7 +621,7 @@
       document.getElementById('item-name').value = '';
       document.getElementById('item-price').value = '';
       document.getElementById('item-total').value = '';
-      document.getElementById('item-unit').value = 'กล่อง'; // รีเซ็ตกลับเป็นกล่องเสมอ
+      document.getElementById('item-unit').value = 'กล่อง';
 
       saveData();
     }
@@ -686,14 +696,16 @@
     function renderData() {
       const filterDate = document.getElementById('filter-date').value;
       const tbody = document.getElementById('data-table-body');
+      const tfoot = document.getElementById('data-table-foot');
       tbody.innerHTML = '';
+      tfoot.innerHTML = '';
 
       let incomeSum = 0;
       let expenseSum = 0;
       let menuCostSum = 0;
       let menuSalesCount = {};
 
-      // สรุปยอดรวมทั้งหมดของวันที่เลือก
+      // สรุปยอดรวมประจำวัน
       const allFiltered = storeData.records.filter(r => r.date === filterDate);
       allFiltered.forEach(item => {
         if (item.type === 'income') {
@@ -706,14 +718,14 @@
         }
       });
 
-      // 🎯 แยกจำแนกการแสดงผลในตารางตามหน้าแท็บอย่างเด็ดขาด
+      // กรองตามแท็บ + เรียงลำดับจากใหม่ไปเก่า (id มากไปน้อย)
       let tabFiltered = [];
       if (currentTab === 'income') {
-        tabFiltered = allFiltered.filter(r => r.type === 'income');
-        document.getElementById('table-title').innerText = 'รายการอาหารที่ขายได้ (รายรับ)';
+        tabFiltered = allFiltered.filter(r => r.type === 'income').sort((a, b) => b.id - a.id);
+        document.getElementById('table-title').innerText = 'รายการอาหารที่ขายได้ (รายรับประจำวัน)';
       } else if (currentTab === 'expense') {
-        tabFiltered = allFiltered.filter(r => r.type === 'expense');
-        document.getElementById('table-title').innerText = 'รายการซื้อของและค่าใช้จ่าย (รายจ่าย)';
+        tabFiltered = allFiltered.filter(r => r.type === 'expense').sort((a, b) => b.id - a.id);
+        document.getElementById('table-title').innerText = 'รายการซื้อของและค่าใช้จ่าย (รายจ่ายประจำวัน)';
       }
 
       tabFiltered.forEach(item => {
@@ -737,7 +749,26 @@
         tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-400">ไม่มีรายการ${currentTab === 'income' ? 'รายรับ' : 'รายจ่าย'}ในวันที่เลือก</td></tr>`;
       }
 
-      // ตารางตั้งค่าเมนูหลังบ้าน (ราคาขายจริง VS ต้นทุน)
+      // แสดงยอดสรุปรวมท้ายตารางเฉพาะของแต่ละหน้า
+      if (currentTab === 'income') {
+        tfoot.innerHTML = `
+          <tr class="text-emerald-700 bg-emerald-50/70">
+            <td colspan="3" class="p-2.5 text-right font-bold">ยอดขายรวมประจำวัน:</td>
+            <td class="p-2.5 text-right font-bold text-sm">${incomeSum.toLocaleString()} บ.</td>
+            <td></td>
+          </tr>
+        `;
+      } else if (currentTab === 'expense') {
+        tfoot.innerHTML = `
+          <tr class="text-rose-700 bg-rose-50/70">
+            <td colspan="3" class="p-2.5 text-right font-bold">รวมค่าใช้จ่ายประจำวัน:</td>
+            <td class="p-2.5 text-right font-bold text-sm">${expenseSum.toLocaleString()} บ.</td>
+            <td></td>
+          </tr>
+        `;
+      }
+
+      // ตารางตั้งค่าเมนูหลังบ้าน
       const menuTable = document.getElementById('menu-cost-table-body');
       const datalist = document.getElementById('menu-suggestions');
       menuTable.innerHTML = '';
@@ -761,7 +792,7 @@
         `;
       });
 
-      // แจ้งเตือนวัตถุดิบใกล้หมด
+      // แจ้งเตือนวัตถุดิบใกล้หมด (แสดงในแท็บสต๊อก)
       const alertList = document.getElementById('stock-alert-list');
       alertList.innerHTML = '';
       let hasAlert = false;
@@ -805,7 +836,7 @@
             <div>
               <div class="flex items-center gap-1.5">
                 <p class="font-bold text-gray-800">${item.name}</p>
-                <button onclick="editMaterial('${item.id}')" title="แก้ไข" class="text-xs text-blue-500 hover:text-blue-700">✏️️</button>
+                <button onclick="editMaterial('${item.id}')" title="แก้ไข" class="text-xs text-blue-500 hover:text-blue-700">✏</button>
                 <button onclick="deleteMaterial('${item.id}')" title="ลบ" class="text-xs text-gray-400 hover:text-rose-600">❌</button>
               </div>
               <p class="text-xs text-gray-500">ต้นทุน: ฿${safeCost} / ${item.unit}</p>
@@ -823,7 +854,7 @@
         `;
       });
 
-      // คำนวณภาพรวมกำไรขาดทุน
+      // คำนวณภาพรวมกำไรขาดทุน (สำหรับแท็บหลังบ้าน)
       const netProfit = incomeSum - menuCostSum - expenseSum;
       const margin = incomeSum > 0 ? ((netProfit / incomeSum) * 100).toFixed(1) : 0;
 
@@ -838,6 +869,7 @@
       const avgDaily = (totalAllIncome / uniqueDays).toFixed(0);
       document.getElementById('avg-daily-sales').innerText = `${parseInt(avgDaily).toLocaleString()} บ. / วัน`;
 
+      // อัปเดตวิเคราะห์ขายดีที่สุดตามจริง
       const topSellingContainer = document.getElementById('top-selling-list');
       const sortedSelling = Object.entries(menuSalesCount).sort((a, b) => b[1] - a[1]);
       if (sortedSelling.length > 0) {
@@ -848,6 +880,7 @@
         topSellingContainer.innerHTML = '- ยังไม่มียอดขายวันนี้ -';
       }
 
+      // อัปเดตเมนูกำไรสูงสุด
       const topProfitContainer = document.getElementById('top-profit-list');
       const menuProfitList = Object.entries(storeData.menuDetails).map(([name, details]) => {
         const profit = details.price - details.cost;
@@ -856,7 +889,7 @@
       }).sort((a, b) => b.marginPct - a.marginPct);
 
       if (menuProfitList.length > 0) {
-        topProfitContainer.innerHTML = menuProfitList.slice(0, 2).map((item, idx) => 
+        topProfitContainer.innerHTML = menuProfitList.slice(0, 3).map((item, idx) => 
           `<p class="font-medium">${idx + 1}. ${item.name} (${item.marginPct}%)</p>`
         ).join('');
       } else {
