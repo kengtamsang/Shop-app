@@ -886,12 +886,14 @@ function editMenuCost(oldName) {
       menuTable.innerHTML = '';
       datalist.innerHTML = '';
 
+      
       sortedMenusByCode.forEach(([name, details]) => {
         const profit = details.price - details.cost;
-        const margin = details.price > 0 ? ((profit / details.price) * 100).toFixed(1) : 0;
+        const margin = details.price > 0 ? ((profit / details.price) * 100).toFixed(0) : 0;
 
-        datalist.innerHTML += `<option value="${details.code || ''}"> ${name} (฿${details.price})</option>`;
         datalist.innerHTML += `<option value="${name}">`;
+        if (details.code) datalist.innerHTML += `<option value="${details.code}">`;
+
         menuTable.innerHTML += `
           <tr class="hover:bg-gray-50">
             <td class="p-2 text-center font-bold text-blue-600 bg-blue-50/50">${details.code || '-'}</td>
@@ -903,8 +905,9 @@ function editMenuCost(oldName) {
               <button onclick="deleteMenuCost('${name}')" title="ลบรายการนี้" class="text-gray-400 hover:text-rose-600">❌</button>
             </td>
           </tr>
-        `; 
+        `;
       });
+
 
       // แจ้งเตือนวัตถุดิบใกล้หมด
       const alertList = document.getElementById('stock-alert-list');
@@ -1011,7 +1014,7 @@ function editMenuCost(oldName) {
       }
     }
 
-    renderData();
+    
   </script>
 </body>
 </html>
