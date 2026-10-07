@@ -41,7 +41,7 @@
       <h1 class="text-lg font-bold text-blue-600 flex items-center gap-2">
         <i class="fa-solid fa-utensils"></i> เก่งตามสั่ง - สต๊อก & กำไร
       </h1>
-      <span class="text-xs bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full font-semibold">v14.0 Quick Code ⚡</span>
+      <span class="text-xs bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full font-semibold">v15.0 Realtime ⚡</span>
     </header>
 
     <!-- Navigation Tabs -->
@@ -61,6 +61,30 @@
     </div>
 
     <main class="p-4 space-y-5 flex-1">
+
+      <!-- 📊 Real-time Dashboard (การ์ดสรุปยอดขายบนสุดของหน้ารายรับ) -->
+      <section id="realtime-sales-dashboard" class="bg-gradient-to-r from-blue-600 to-indigo-600 p-3.5 rounded-xl text-white shadow-md space-y-2">
+        <div class="flex justify-between items-center">
+          <p class="text-xs font-bold flex items-center gap-1.5 opacity-90">
+            <i class="fa-solid fa-chart-line"></i> ยอดขายเรียลไทม์
+          </p>
+          <span id="rt-today-orders" class="text-[10px] bg-white/20 backdrop-blur-md px-2 py-0.5 rounded-full font-medium">0 รายการวันนี้</span>
+        </div>
+        <div class="grid grid-cols-3 gap-2 text-center pt-1">
+          <div class="bg-white/10 backdrop-blur-md p-2 rounded-lg border border-white/15">
+            <p class="text-[10px] opacity-80">วันนี้</p>
+            <p id="rt-daily-sales" class="text-sm font-bold text-yellow-300">฿0</p>
+          </div>
+          <div class="bg-white/10 backdrop-blur-md p-2 rounded-lg border border-white/15">
+            <p class="text-[10px] opacity-80">สัปดาห์นี้</p>
+            <p id="rt-weekly-sales" class="text-sm font-bold">฿0</p>
+          </div>
+          <div class="bg-white/10 backdrop-blur-md p-2 rounded-lg border border-white/15">
+            <p class="text-[10px] opacity-80">เดือนนี้</p>
+            <p id="rt-monthly-sales" class="text-sm font-bold">฿0</p>
+          </div>
+        </div>
+      </section>
 
       <!-- Form Section สำหรับ รายรับ / รายจ่าย -->
       <section id="form-section" class="bg-white p-4 rounded-xl border border-gray-200 space-y-3 shadow-sm">
@@ -421,101 +445,101 @@
     }
 
     function parseVoiceOrder(text) {
-  let qty = 1;
-  let unit = 'กล่อง';
-  let targetMenuName = '';
+      let qty = 1;
+      let unit = 'กล่อง';
+      let targetMenuName = '';
 
-  const cleanText = text.trim();
+      const cleanText = text.trim();
 
-  // 1. ลองหาว่าตรงกับชื่อเมนูโดยตรงหรือไม่
-  const allMenuNames = Object.keys(storeData.menuDetails);
-  const matchedDirectName = allMenuNames.find(name => cleanText.includes(name));
+      // 1. ลองหาว่าตรงกับชื่อเมนูโดยตรงหรือไม่
+      const allMenuNames = Object.keys(storeData.menuDetails);
+      const matchedDirectName = allMenuNames.find(name => cleanText.includes(name));
 
-  if (matchedDirectName) {
-    targetMenuName = matchedDirectName;
-    const qtyMatch = cleanText.match(/(\d+|หนึ่ง|สอง|สาม|สี่|ห้า|หก|เจ็ด|แปด|เก้า|สิบ)\s*(กล่อง|แก้ว|ชุด|ถุง|จาน|ขวด)?/);
-    if (qtyMatch) {
-      qty = wordToNumber(qtyMatch[1]) || 1;
-      if (qtyMatch[2]) unit = qtyMatch[2];
-    }
-  } else {
-    // 2. ถ้าไม่เจอชื่อตรงๆ ค่อยเช็คว่าเป็นรหัสตัวเลขหรือไม่
-    const firstWordMatch = cleanText.match(/^(\d+|หนึ่ง|สอง|สาม|สี่|ห้า|หก|เจ็ด|แปด|เก้า|สิบ)/);
-    if (firstWordMatch) {
-      const codeNum = wordToNumber(firstWordMatch[1]);
-      
-      const foundEntry = Object.entries(storeData.menuDetails).find(([name, details]) => details.code && details.code == codeNum);
-      if (foundEntry) {
-        targetMenuName = foundEntry[0];
-
-        const restText = cleanText.replace(firstWordMatch[0], '').trim();
-        const qtyMatch = restText.match(/(\d+|หนึ่ง|สอง|สาม|สี่|ห้า|หก|เจ็ด|แปด|เก้า|สิบ)\s*(กล่อง|แก้ว|ชุด|ถุง|จาน|ขวด)?/);
+      if (matchedDirectName) {
+        targetMenuName = matchedDirectName;
+        const qtyMatch = cleanText.match(/(\d+|หนึ่ง|สอง|สาม|สี่|ห้า|หก|เจ็ด|แปด|เก้า|สิบ)\s*(กล่อง|แก้ว|ชุด|ถุง|จาน|ขวด)?/);
         if (qtyMatch) {
           qty = wordToNumber(qtyMatch[1]) || 1;
           if (qtyMatch[2]) unit = qtyMatch[2];
         }
+      } else {
+        // 2. ถ้าไม่เจอชื่อตรงๆ ค่อยเช็คว่าเป็นรหัสตัวเลขหรือไม่
+        const firstWordMatch = cleanText.match(/^(\d+|หนึ่ง|สอง|สาม|สี่|ห้า|หก|เจ็ด|แปด|เก้า|สิบ)/);
+        if (firstWordMatch) {
+          const codeNum = wordToNumber(firstWordMatch[1]);
+          
+          const foundEntry = Object.entries(storeData.menuDetails).find(([name, details]) => details.code && details.code == codeNum);
+          if (foundEntry) {
+            targetMenuName = foundEntry[0];
+
+            const restText = cleanText.replace(firstWordMatch[0], '').trim();
+            const qtyMatch = restText.match(/(\d+|หนึ่ง|สอง|สาม|สี่|ห้า|หก|เจ็ด|แปด|เก้า|สิบ)\s*(กล่อง|แก้ว|ชุด|ถุง|จาน|ขวด)?/);
+            if (qtyMatch) {
+              qty = wordToNumber(qtyMatch[1]) || 1;
+              if (qtyMatch[2]) unit = qtyMatch[2];
+            }
+          }
+        }
+      }
+
+      // 3. ถ้ายังไม่พบเมนู ให้ดึงข้อความมาเป็นชื่อรายการตามปกติ
+      if (!targetMenuName) {
+        let name = cleanText;
+        const qtyMatch = cleanText.match(/(\d+|หนึ่ง|สอง|สาม|สี่|ห้า|หก|เจ็ด|แปด|เก้า|สิบ)\s*(กล่อง|แก้ว|ชุด|ถุง|จาน|ขวด)?/);
+        if (qtyMatch) {
+          qty = wordToNumber(qtyMatch[1]) || 1;
+          if (qtyMatch[2]) unit = qtyMatch[2];
+        }
+        name = name.replace(/(\d+|หนึ่ง|สอง|สาม|สี่|ห้า)\s*(กล่อง|แก้ว|ชุด|ถุง|จาน|ขวด)?/g, '').replace(/เอา|สั่ง|ขอ/g, '').trim();
+        if (name.includes('กระเพรา')) name = name.replace('กระเพรา', 'กะเพรา');
+        targetMenuName = name;
+      }
+
+      document.getElementById('item-name').value = targetMenuName;
+      document.getElementById('item-qty').value = qty;
+      document.getElementById('item-unit').value = unit;
+
+      if (storeData.menuDetails[targetMenuName]) {
+        document.getElementById('item-price').value = storeData.menuDetails[targetMenuName].price;
+      } else {
+        autoFillPrice();
+      }
+
+      calculateTotal();
+
+      if (storeData.menuDetails[targetMenuName] && currentTab === 'income') {
+        addRecord();
       }
     }
-  }
 
-  // 3. ถ้ายังไม่พบเมนู ให้ดึงข้อความมาเป็นชื่อรายการตามปกติ
-  if (!targetMenuName) {
-    let name = cleanText;
-    const qtyMatch = cleanText.match(/(\d+|หนึ่ง|สอง|สาม|สี่|ห้า|หก|เจ็ด|แปด|เก้า|สิบ)\s*(กล่อง|แก้ว|ชุด|ถุง|จาน|ขวด)?/);
-    if (qtyMatch) {
-      qty = wordToNumber(qtyMatch[1]) || 1;
-      if (qtyMatch[2]) unit = qtyMatch[2];
+    function editMenuCost(oldName) {
+      const current = storeData.menuDetails[oldName];
+      if (!current) return;
+
+      const newCode = prompt('แก้ไขรหัสเมนูด่วน (เว้นว่างไว้ได้หากไม่ต้องการใช้รหัส):', current.code !== undefined ? current.code : '');
+      if (newCode === null) return;
+
+      const newName = prompt('แก้ไขชื่อเมนูอาหาร:', oldName);
+      if (!newName || newName.trim() === '') return;
+
+      const newPrice = prompt('แก้ไขราคาขายจริง (บาท):', current.price);
+      if (newPrice === null) return;
+
+      const newCost = prompt('แก้ไขราคาต้นทุนวัตถุดิบ (บาท):', current.cost);
+      if (newCost === null) return;
+
+      if (newName.trim() !== oldName) {
+        delete storeData.menuDetails[oldName];
+      }
+
+      storeData.menuDetails[newName.trim()] = {
+        code: newCode.trim() !== '' ? parseInt(newCode) : '',
+        price: parseFloat(newPrice) || 0,
+        cost: parseFloat(newCost) || 0
+      };
+
+      saveData();
     }
-    name = name.replace(/(\d+|หนึ่ง|สอง|สาม|สี่|ห้า)\s*(กล่อง|แก้ว|ชุด|ถุง|จาน|ขวด)?/g, '').replace(/เอา|สั่ง|ขอ/g, '').trim();
-    if (name.includes('กระเพรา')) name = name.replace('กระเพรา', 'กะเพรา');
-    targetMenuName = name;
-  }
-
-  document.getElementById('item-name').value = targetMenuName;
-  document.getElementById('item-qty').value = qty;
-  document.getElementById('item-unit').value = unit;
-
-  if (storeData.menuDetails[targetMenuName]) {
-    document.getElementById('item-price').value = storeData.menuDetails[targetMenuName].price;
-  } else {
-    autoFillPrice();
-  }
-
-  calculateTotal();
-
-  if (storeData.menuDetails[targetMenuName] && currentTab === 'income') {
-    addRecord();
-  }
-}
-function editMenuCost(oldName) {
-  const current = storeData.menuDetails[oldName];
-  if (!current) return;
-
-  const newCode = prompt('แก้ไขรหัสเมนูด่วน (เว้นว่างไว้ได้หากไม่ต้องการใช้รหัส):', current.code !== undefined ? current.code : '');
-  if (newCode === null) return;
-
-  const newName = prompt('แก้ไขชื่อเมนูอาหาร:', oldName);
-  if (!newName || newName.trim() === '') return;
-
-  const newPrice = prompt('แก้ไขราคาขายจริง (บาท):', current.price);
-  if (newPrice === null) return;
-
-  const newCost = prompt('แก้ไขราคาต้นทุนวัตถุดิบ (บาท):', current.cost);
-  if (newCost === null) return;
-
-  if (newName.trim() !== oldName) {
-    delete storeData.menuDetails[oldName];
-  }
-
-  storeData.menuDetails[newName.trim()] = {
-    code: newCode.trim() !== '' ? parseInt(newCode) : '',
-    price: parseFloat(newPrice) || 0,
-    cost: parseFloat(newCost) || 0
-  };
-
-  saveData();
-}
-
 
     function selectQuickMenu(name) {
       document.getElementById('item-name').value = name;
@@ -543,6 +567,7 @@ function editMenuCost(oldName) {
       const stockSection = document.getElementById('stock-section');
       const tableSection = document.getElementById('table-section');
       const quickMenuBar = document.getElementById('quick-menu-bar');
+      const realtimeDashboard = document.getElementById('realtime-sales-dashboard');
 
       const nameLabel = document.getElementById('name-label');
       const submitBtn = document.getElementById('submit-btn');
@@ -552,11 +577,13 @@ function editMenuCost(oldName) {
         costSection.classList.remove('hidden');
         stockSection.classList.add('hidden');
         tableSection.classList.add('hidden');
+        if (realtimeDashboard) realtimeDashboard.classList.add('hidden');
       } else if (tab === 'stock') {
         formSection.classList.add('hidden');
         costSection.classList.add('hidden');
         stockSection.classList.remove('hidden');
         tableSection.classList.add('hidden');
+        if (realtimeDashboard) realtimeDashboard.classList.add('hidden');
       } else {
         formSection.classList.remove('hidden');
         costSection.classList.add('hidden');
@@ -564,11 +591,13 @@ function editMenuCost(oldName) {
         tableSection.classList.remove('hidden');
 
         if (tab === 'income') {
+          if (realtimeDashboard) realtimeDashboard.classList.remove('hidden');
           quickMenuBar.classList.remove('hidden');
           nameLabel.innerText = 'เลือก/กรอกชื่อรายการอาหาร (หรือพิมพ์เลขรหัสสั่งสั้น):';
           submitBtn.innerText = '+ บันทึกรายรับ (ตัดสต๊อกอัตโนมัติ)';
           submitBtn.className = 'w-full bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold py-2.5 rounded-xl text-xs transition shadow';
         } else if (tab === 'expense') {
+          if (realtimeDashboard) realtimeDashboard.classList.add('hidden');
           quickMenuBar.classList.add('hidden');
           nameLabel.innerText = 'ชื่อรายการซื้อของ / รายจ่ายของร้าน:';
           submitBtn.innerText = '+ บันทึกรายจ่าย';
@@ -791,7 +820,51 @@ function editMenuCost(oldName) {
       }
     }
 
+    // คำนวณสรุปยอดขาย เรียลไทม์ (รายวัน / รายสัปดาห์ / รายเดือน)
+    function updateRealtimeSalesDashboard() {
+      const now = new Date();
+      const today = now.toISOString().split('T')[0];
+      const currentMonth = today.substring(0, 7);
+
+      // หาวันจันทร์ของสัปดาห์นี้
+      const dayOfWeek = now.getDay() || 7; // 1=Mon, 7=Sun
+      const mondayDate = new Date(now);
+      mondayDate.setDate(now.getDate() - dayOfWeek + 1);
+      mondayDate.setHours(0, 0, 0, 0);
+
+      let dSales = 0;
+      let wSales = 0;
+      let mSales = 0;
+      let todayCount = 0;
+
+      storeData.records.forEach(r => {
+        if (r.type === 'income') {
+          const rDate = new Date(r.date + 'T00:00:00');
+          const amt = r.total || 0;
+
+          if (r.date === today) {
+            dSales += amt;
+            todayCount += 1;
+          }
+          if (rDate >= mondayDate && rDate <= now) {
+            wSales += amt;
+          }
+          if (r.date.startsWith(currentMonth)) {
+            mSales += amt;
+          }
+        }
+      });
+
+      document.getElementById('rt-daily-sales').innerText = `฿${dSales.toLocaleString()}`;
+      document.getElementById('rt-weekly-sales').innerText = `฿${wSales.toLocaleString()}`;
+      document.getElementById('rt-monthly-sales').innerText = `฿${mSales.toLocaleString()}`;
+      document.getElementById('rt-today-orders').innerText = `${todayCount} รายการวันนี้`;
+    }
+
     function renderData() {
+      // อัปเดตการ์ดสรุปยอดขายเรียลไทม์
+      updateRealtimeSalesDashboard();
+
       const filterDate = document.getElementById('filter-date').value;
       const tbody = document.getElementById('data-table-body');
       const tfoot = document.getElementById('data-table-foot');
@@ -886,7 +959,6 @@ function editMenuCost(oldName) {
       menuTable.innerHTML = '';
       datalist.innerHTML = '';
 
-      
       sortedMenusByCode.forEach(([name, details]) => {
         const profit = details.price - details.cost;
         const margin = details.price > 0 ? ((profit / details.price) * 100).toFixed(0) : 0;
@@ -907,7 +979,6 @@ function editMenuCost(oldName) {
           </tr>
         `;
       });
-
 
       // แจ้งเตือนวัตถุดิบใกล้หมด
       const alertList = document.getElementById('stock-alert-list');
@@ -1014,7 +1085,8 @@ function editMenuCost(oldName) {
       }
     }
 
-    
+    // เรียกทำงานเริ่มต้น
+    renderData();
   </script>
 </body>
 </html>
