@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>เก่งตามสั่ง - บัญชี สต๊อก & รหัสเมนูด่วนสั่งด้วยเสียง</title>
+  <title>เก่งตามสั่ง - บัญชี สต๊อก & วิเคราะห์ยอดขาย</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <style>
@@ -32,20 +32,20 @@
     }
   </style>
 </head>
-<body class="pb-12">
+<body class="pb-16">
 
-  <div class="max-w-md mx-auto bg-white min-h-screen shadow-md flex flex-col">
+  <div class="max-w-md mx-auto bg-white min-h-screen shadow-md flex flex-col relative">
     
     <!-- Title Bar -->
-    <header class="p-4 bg-white border-b border-gray-200 flex justify-between items-center sticky top-0 z-50">
+    <header class="p-4 bg-white border-b border-gray-200 flex justify-between items-center sticky top-0 z-40">
       <h1 class="text-lg font-bold text-blue-600 flex items-center gap-2">
         <i class="fa-solid fa-utensils"></i> เก่งตามสั่ง - สต๊อก & กำไร
       </h1>
-      <span class="text-xs bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full font-semibold">v15.0 Realtime ⚡</span>
+      <span class="text-xs bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full font-semibold">v16.0 Analytics ⚡</span>
     </header>
 
     <!-- Navigation Tabs -->
-    <div class="p-2 grid grid-cols-4 gap-1 bg-gray-50 border-b border-gray-200 text-xs font-medium sticky top-[61px] z-40">
+    <div class="p-2 grid grid-cols-4 gap-1 bg-gray-50 border-b border-gray-200 text-xs font-medium sticky top-[61px] z-30">
       <button onclick="switchTab('income')" id="tab-income" class="tab-btn active py-2 rounded-lg flex flex-col items-center justify-center transition shadow-sm">
         <span>🟦 รายรับ</span>
       </button>
@@ -62,15 +62,17 @@
 
     <main class="p-4 space-y-5 flex-1">
 
-      <!-- 📊 Real-time Dashboard (การ์ดสรุปยอดขายบนสุดของหน้ารายรับ) -->
-      <section id="realtime-sales-dashboard" class="bg-gradient-to-r from-blue-600 to-indigo-600 p-3.5 rounded-xl text-white shadow-md space-y-2">
+      <!-- 📊 Real-time & Custom Range Sales Dashboard -->
+      <section id="realtime-sales-dashboard" class="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 rounded-xl text-white shadow-md space-y-3">
         <div class="flex justify-between items-center">
           <p class="text-xs font-bold flex items-center gap-1.5 opacity-90">
-            <i class="fa-solid fa-chart-line"></i> ยอดขายเรียลไทม์
+            <i class="fa-solid fa-chart-line"></i> สรุปยอดขาย & วิเคราะห์ย้อนหลัง
           </p>
           <span id="rt-today-orders" class="text-[10px] bg-white/20 backdrop-blur-md px-2 py-0.5 rounded-full font-medium">0 รายการวันนี้</span>
         </div>
-        <div class="grid grid-cols-3 gap-2 text-center pt-1">
+
+        <!-- การ์ดสรุป 3 ช่วงเวลาหลัก -->
+        <div class="grid grid-cols-3 gap-2 text-center">
           <div class="bg-white/10 backdrop-blur-md p-2 rounded-lg border border-white/15">
             <p class="text-[10px] opacity-80">วันนี้</p>
             <p id="rt-daily-sales" class="text-sm font-bold text-yellow-300">฿0</p>
@@ -84,6 +86,34 @@
             <p id="rt-monthly-sales" class="text-sm font-bold">฿0</p>
           </div>
         </div>
+
+        <!-- 🔍 ส่วนค้นหาย้อนหลังแบบกำหนดวันเอง (Custom Range Filter) -->
+        <div class="bg-white/10 backdrop-blur-md p-2.5 rounded-lg border border-white/20 space-y-2 text-xs">
+          <p class="font-bold text-[11px] text-yellow-200 flex items-center gap-1">
+            <i class="fa-solid fa-calendar-days"></i> เช็คยอดขายย้อนหลังอิสระ (เช่น วันที่ 1-7 หรือเดือนที่แล้ว):
+          </p>
+          <div class="grid grid-cols-2 gap-2 text-gray-800">
+            <div>
+              <label class="block text-[10px] text-white/80 mb-0.5">เริ่มวันที่:</label>
+              <input type="date" id="range-start-date" onchange="calculateCustomRange()" class="w-full bg-white p-1 rounded text-xs font-medium">
+            </div>
+            <div>
+              <label class="block text-[10px] text-white/80 mb-0.5">ถึงวันที่:</label>
+              <input type="date" id="range-end-date" onchange="calculateCustomRange()" class="w-full bg-white p-1 rounded text-xs font-medium">
+            </div>
+          </div>
+          <!-- ผลลัพธ์ช่วงเวลาที่เลือก -->
+          <div id="custom-range-result" class="bg-white/20 p-2 rounded text-[11px] space-y-1">
+            <div class="flex justify-between">
+              <span>ยอดขายรวม: <strong id="cr-sales" class="text-yellow-300">฿0</strong></span>
+              <span>รายจ่ายรวม: <strong id="cr-expense" class="text-rose-200">฿0</strong></span>
+            </div>
+            <div class="flex justify-between border-t border-white/20 pt-1">
+              <span>กำไรสุทธิ: <strong id="cr-profit" class="text-emerald-300">฿0</strong></span>
+              <span>เฉลี่ย/วัน: <strong id="cr-avg-daily" class="text-white">฿0</strong></span>
+            </div>
+          </div>
+        </div>
       </section>
 
       <!-- Form Section สำหรับ รายรับ / รายจ่าย -->
@@ -93,20 +123,18 @@
             <i class="fa-solid fa-pen-to-square"></i> บันทึกรายการ
           </h2>
           <!-- ปุ่มไมค์ -->
-          <button id="mic-btn" onclick="toggleVoiceRecognition()" title="กดเพื่อพูดสั่งงาน (พูดเลขเมนูได้ เช่น 1 หรือ 1 สองกล่อง)" class="w-12 h-12 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 border-2 border-blue-400 flex items-center justify-center transition shadow-sm active:scale-95">
-            <i class="fa-solid fa-microphone text-xl"></i>
+          <button id="mic-btn" onclick="toggleVoiceRecognition()" title="กดเพื่อพูดสั่งงาน" class="w-11 h-11 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 border-2 border-blue-400 flex items-center justify-center transition shadow-sm active:scale-95">
+            <i class="fa-solid fa-microphone text-lg"></i>
           </button>
         </div>
 
-        <!-- แถบปุ่มเมนูด่วน ( Quick Code Shortcut Keys ) -->
+        <!-- แถบปุ่มเมนูด่วน -->
         <div id="quick-menu-bar" class="p-2 bg-blue-50 border border-blue-100 rounded-lg space-y-1">
           <p class="text-[11px] font-bold text-blue-800 flex justify-between">
             <span>⚡ รหัสเมนูด่วน (พูดเลขหรือกดปุ่มได้เลย):</span>
-            <span class="text-blue-500 font-normal">แก้ไขรหัสได้ที่หน้า⚙หลังบ้าน</span>
+            <span class="text-blue-500 font-normal">แก้ไขได้หน้า⚙หลังบ้าน</span>
           </p>
-          <div id="quick-menu-buttons" class="flex gap-1.5 overflow-x-auto pb-1 text-xs">
-            <!-- ปุ่มเมนูด่วนจะแสดงตรงนี้ -->
-          </div>
+          <div id="quick-menu-buttons" class="flex gap-1.5 overflow-x-auto pb-1 text-xs"></div>
         </div>
         
         <div>
@@ -116,7 +144,7 @@
 
         <div>
           <label id="name-label" class="block text-xs font-semibold text-gray-700 mb-1">เลือก/กรอกชื่อรายการ:</label>
-          <input type="text" id="item-name" list="menu-suggestions" placeholder="พูดชื่อเมนู หรือพูดรหัสเลข เช่น 1" onchange="autoFillPrice()" class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs text-gray-800 focus:outline-none focus:border-blue-500">
+          <input type="text" id="item-name" list="menu-suggestions" placeholder="พูดชื่อเมนู หรือพิมพ์รหัส เช่น 1" oninput="autoDetectUnitAndPrice()" class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs text-gray-800 focus:outline-none focus:border-blue-500">
           <datalist id="menu-suggestions"></datalist>
         </div>
 
@@ -145,7 +173,7 @@
         </button>
       </section>
 
-      <!-- Table Section ตารางรวมรายการประจำวัน (สำหรับ รายรับ/รายจ่าย) -->
+      <!-- Table Section ตารางรวมรายการประจำวัน -->
       <section id="table-section" class="space-y-2">
         <h3 id="table-title" class="text-xs font-bold text-gray-700">ตารางบันทึกรายการประจำวัน</h3>
         <div class="overflow-x-auto border border-gray-200 rounded-xl bg-white shadow-sm">
@@ -159,20 +187,15 @@
                 <th class="p-2.5 text-center">ลบ</th>
               </tr>
             </thead>
-            <tbody id="data-table-body" class="divide-y divide-gray-100 bg-white">
-              <!-- ข้อมูลรายการจะถูกแสดงตรงนี้ -->
-            </tbody>
-            <tfoot id="data-table-foot" class="bg-gray-50 font-bold border-t border-gray-200">
-              <!-- ยอดสรุปประจำวันล่างสุดตาราง -->
-            </tfoot>
+            <tbody id="data-table-body" class="divide-y divide-gray-100 bg-white"></tbody>
+            <tfoot id="data-table-foot" class="bg-gray-50 font-bold border-t border-gray-200"></tfoot>
           </table>
         </div>
       </section>
 
-      <!-- Section หลังบ้าน (รวมวิเคราะห์อันดับ + สรุปผลประกอบการ + ตั้งค่าเมนู) -->
+      <!-- Section หลังบ้าน -->
       <section id="cost-section" class="space-y-4 hidden">
-        
-        <!-- 1. วิเคราะห์อันดับเมนูขายดี / กำไรสูงสุด -->
+        <!-- วิเคราะห์อันดับเมนู -->
         <div id="analytics-section" class="bg-white p-4 rounded-xl border border-gray-200 space-y-3 shadow-sm">
           <h2 class="text-sm font-bold text-gray-800 flex items-center gap-2">
             <i class="fa-solid fa-ranking-star text-amber-500"></i> วิเคราะห์อันดับเมนู
@@ -180,20 +203,16 @@
           <div class="grid grid-cols-2 gap-2 text-xs">
             <div class="bg-amber-50/60 p-2.5 rounded-lg border border-amber-200">
               <p class="text-amber-800 font-bold mb-1.5"><i class="fa-solid fa-fire mr-1 text-amber-500"></i>ขายดีที่สุด</p>
-              <div id="top-selling-list" class="text-gray-700 space-y-1 text-[11px]">
-                - ยังไม่มีข้อมูล -
-              </div>
+              <div id="top-selling-list" class="text-gray-700 space-y-1 text-[11px]">- ยังไม่มีข้อมูล -</div>
             </div>
             <div class="bg-emerald-50/60 p-2.5 rounded-lg border border-emerald-200">
               <p class="text-emerald-800 font-bold mb-1.5"><i class="fa-solid fa-money-bill-trend-up mr-1 text-emerald-500"></i>กำไรสูงสุด/กล่อง</p>
-              <div id="top-profit-list" class="text-gray-700 space-y-1 text-[11px]">
-                - ยังไม่มีข้อมูล -
-              </div>
+              <div id="top-profit-list" class="text-gray-700 space-y-1 text-[11px]">- ยังไม่มีข้อมูล -</div>
             </div>
           </div>
         </div>
 
-        <!-- 2. Dashboard สรุปผลประกอบการ -->
+        <!-- Dashboard สรุปผลประกอบการ -->
         <div id="dashboard-section" class="bg-emerald-50 p-4 rounded-xl border border-emerald-200 space-y-3 shadow-sm">
           <div class="flex justify-between items-center">
             <h2 class="text-sm font-bold text-emerald-900 flex items-center gap-2">
@@ -234,7 +253,7 @@
           </div>
         </div>
 
-        <!-- 3. ตั้งค่าราคาขาย & ต้นทุนอาหาร & รหัสเมนูด่วน -->
+        <!-- ตั้งค่าราคาขาย & ต้นทุนอาหาร -->
         <div class="bg-white p-4 rounded-xl border border-gray-200 space-y-4 shadow-sm">
           <h2 class="text-sm font-bold text-blue-600 flex items-center gap-2">
             <i class="fa-solid fa-gear"></i> ตั้งค่าราคาขาย, ต้นทุน & รหัสเมนูด่วน
@@ -242,7 +261,7 @@
 
           <div class="space-y-3 bg-blue-50/50 p-3 rounded-lg border border-blue-100 text-xs">
             <div class="grid grid-cols-3 gap-2">
-              <div class="col-span-1">
+              <div>
                 <label class="block font-semibold text-gray-700 mb-1">รหัสสั่งสั้น:</label>
                 <input type="number" id="cost-menu-code" placeholder="เช่น 1" class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs font-bold text-blue-600 text-center focus:outline-none focus:border-blue-500">
               </div>
@@ -286,9 +305,7 @@
                     <th class="p-2 text-center">จัดการ</th>
                   </tr>
                 </thead>
-                <tbody id="menu-cost-table-body" class="divide-y divide-gray-100 bg-white">
-                  <!-- รายการเมนูจะแสดงที่นี่ -->
-                </tbody>
+                <tbody id="menu-cost-table-body" class="divide-y divide-gray-100 bg-white"></tbody>
               </table>
             </div>
           </div>
@@ -298,15 +315,11 @@
 
       <!-- Stock Management Section -->
       <section id="stock-section" class="space-y-4 hidden">
-        
-        <!-- Section แจ้งเตือนวัตถุดิบใกล้หมด -->
         <div id="stock-alert-box" class="bg-amber-50 border border-amber-200 p-4 rounded-xl space-y-2 shadow-sm">
           <h3 class="text-xs font-bold text-amber-800 flex items-center gap-1.5">
             <i class="fa-solid fa-triangle-exclamation animate-pulse"></i> แจ้งเตือนวัตถุดิบใกล้หมด
           </h3>
-          <div id="stock-alert-list" class="space-y-2 text-xs">
-            <!-- แจ้งเตือนวัตถุดิบจาก JS -->
-          </div>
+          <div id="stock-alert-list" class="space-y-2 text-xs"></div>
         </div>
 
         <div class="bg-white p-4 rounded-xl border border-gray-200 space-y-3 shadow-sm">
@@ -319,13 +332,58 @@
             </button>
           </div>
 
-          <div id="stock-items-list" class="space-y-2.5 text-xs">
-            <!-- รายการสต๊อกวัตถุดิบ -->
-          </div>
+          <div id="stock-items-list" class="space-y-2.5 text-xs"></div>
         </div>
       </section>
 
     </main>
+
+    <!-- 🧮 Floating Calculator Button & Modal -->
+    <button onclick="toggleCalculator()" class="fixed bottom-5 right-5 w-14 h-14 bg-amber-500 hover:bg-amber-600 text-white rounded-full flex items-center justify-center shadow-lg active:scale-95 transition-all z-50">
+      <i class="fa-solid fa-calculator text-2xl"></i>
+    </button>
+
+    <!-- Modal เครื่องคิดเลข -->
+    <div id="calc-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+      <div class="bg-white w-full max-w-xs rounded-2xl p-4 shadow-2xl space-y-3">
+        <div class="flex justify-between items-center border-b pb-2">
+          <h3 class="font-bold text-gray-800 text-sm flex items-center gap-1.5">
+            <i class="fa-solid fa-calculator text-amber-500"></i> เครื่องคิดเลขด่วน
+          </h3>
+          <button onclick="toggleCalculator()" class="text-gray-400 hover:text-gray-700 font-bold text-lg">&times;</button>
+        </div>
+
+        <div class="bg-gray-100 p-3 rounded-xl text-right">
+          <input type="text" id="calc-screen" value="0" readonly class="w-full bg-transparent text-right text-2xl font-bold text-gray-800 focus:outline-none">
+        </div>
+
+        <div class="grid grid-cols-4 gap-2 text-sm font-bold">
+          <button onclick="calcClear()" class="bg-rose-100 text-rose-600 p-3 rounded-xl hover:bg-rose-200 active:scale-95">C</button>
+          <button onclick="calcInput('/')" class="bg-amber-100 text-amber-700 p-3 rounded-xl hover:bg-amber-200 active:scale-95">÷</button>
+          <button onclick="calcInput('*')" class="bg-amber-100 text-amber-700 p-3 rounded-xl hover:bg-amber-200 active:scale-95">×</button>
+          <button onclick="calcBackspace()" class="bg-gray-200 text-gray-700 p-3 rounded-xl hover:bg-gray-300 active:scale-95"><i class="fa-solid fa-backspace"></i></button>
+
+          <button onclick="calcInput('7')" class="bg-gray-100 p-3 rounded-xl hover:bg-gray-200 active:scale-95">7</button>
+          <button onclick="calcInput('8')" class="bg-gray-100 p-3 rounded-xl hover:bg-gray-200 active:scale-95">8</button>
+          <button onclick="calcInput('9')" class="bg-gray-100 p-3 rounded-xl hover:bg-gray-200 active:scale-95">9</button>
+          <button onclick="calcInput('-')" class="bg-amber-100 text-amber-700 p-3 rounded-xl hover:bg-amber-200 active:scale-95">-</button>
+
+          <button onclick="calcInput('4')" class="bg-gray-100 p-3 rounded-xl hover:bg-gray-200 active:scale-95">4</button>
+          <button onclick="calcInput('5')" class="bg-gray-100 p-3 rounded-xl hover:bg-gray-200 active:scale-95">5</button>
+          <button onclick="calcInput('6')" class="bg-gray-100 p-3 rounded-xl hover:bg-gray-200 active:scale-95">6</button>
+          <button onclick="calcInput('+')" class="bg-amber-100 text-amber-700 p-3 rounded-xl hover:bg-amber-200 active:scale-95">+</button>
+
+          <button onclick="calcInput('1')" class="bg-gray-100 p-3 rounded-xl hover:bg-gray-200 active:scale-95">1</button>
+          <button onclick="calcInput('2')" class="bg-gray-100 p-3 rounded-xl hover:bg-gray-200 active:scale-95">2</button>
+          <button onclick="calcInput('3')" class="bg-gray-100 p-3 rounded-xl hover:bg-gray-200 active:scale-95">3</button>
+          <button onclick="calcEqual()" class="row-span-2 bg-amber-500 text-white rounded-xl hover:bg-amber-600 active:scale-95 flex items-center justify-center text-xl">=</button>
+
+          <button onclick="calcInput('0')" class="col-span-2 bg-gray-100 p-3 rounded-xl hover:bg-gray-200 active:scale-95">0</button>
+          <button onclick="calcInput('.')" class="bg-gray-100 p-3 rounded-xl hover:bg-gray-200 active:scale-95">.</button>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <script>
@@ -334,6 +392,12 @@
     
     document.getElementById('record-date').value = todayStr;
     document.getElementById('filter-date').value = todayStr;
+
+    // กำหนดค่าเริ่มต้นช่วงวันเช็คย้อนหลัง (ย้อนหลัง 7 วัน)
+    const d7Ago = new Date();
+    d7Ago.setDate(d7Ago.getDate() - 6);
+    document.getElementById('range-start-date').value = d7Ago.toISOString().split('T')[0];
+    document.getElementById('range-end-date').value = todayStr;
 
     function syncFilterDate() {
       document.getElementById('filter-date').value = document.getElementById('record-date').value;
@@ -345,7 +409,6 @@
       renderData();
     }
 
-    // คลังวัตถุดิบตั้งต้น
     const defaultInventory = [
       { id: 'pork', name: 'หมูสด (สับ/ชิ้น)', qty: 10.0, unit: 'กก.', costPerUnit: 160, alertThreshold: 1.5, defaultUsage: 0.08 },
       { id: 'chicken', name: 'เนื้อไก่สด', qty: 10.0, unit: 'กก.', costPerUnit: 90, alertThreshold: 1.5, defaultUsage: 0.08 },
@@ -363,7 +426,6 @@
       { id: 'cup', name: 'แก้วน้ำ', qty: 100, unit: 'ใบ', costPerUnit: 1.5, alertThreshold: 20, defaultUsage: 1 }
     ];
 
-    // เพิ่มรหัสเมนูด่วน (code) ใน defaultMenuDetails
     const defaultMenuDetails = {
       'กะเพราหมูสับ': { code: 1, price: 60, cost: 21.90 },
       'กะเพราหมูกรอบ': { code: 2, price: 70, cost: 30.00 },
@@ -387,7 +449,89 @@
       renderData();
     }
 
-    // 🎙️ ระบบสั่งงานด้วยเสียง (ปรับรองรับการพูดด้วยรหัสตัวเลข)
+    // 🏷️ ตรวจจับหน่วยนับอัตโนมัติ (Smart Auto Unit Detection)
+    function autoDetectUnitAndPrice() {
+      const nameInput = document.getElementById('item-name');
+      const unitInput = document.getElementById('item-unit');
+      let val = nameInput.value.trim();
+
+      // เช็คว่าเป็นรหัสเมนูด่วนหรือไม่
+      if (!isNaN(val) && val !== '') {
+        const found = Object.entries(storeData.menuDetails).find(([n, d]) => d.code == val);
+        if (found) {
+          val = found[0];
+          nameInput.value = val;
+        }
+      }
+
+      // ดึงราคาขาย
+      if (currentTab === 'income' && storeData.menuDetails[val]) {
+        document.getElementById('item-price').value = storeData.menuDetails[val].price;
+      }
+
+      // ปรับหน่วยนับอัตโนมัติ
+      if (currentTab === 'income') {
+        const beverageKeywords = ['น้ำ', 'ชา', 'กาแฟ', 'โซดา', 'นม', 'เป๊ปซี่', 'โค้ก', 'สไปรท์', 'โอเลี้ยง'];
+        const dishKeywords = ['กับข้าว', 'ถุง', 'ต้ม', 'แกง', 'กับ', 'แกงจืด', 'ต้มยำ'];
+
+        if (beverageKeywords.some(kw => val.includes(kw))) {
+          unitInput.value = 'แก้ว';
+        } else if (dishKeywords.some(kw => val.includes(kw))) {
+          unitInput.value = 'ถุง';
+        } else {
+          unitInput.value = 'กล่อง';
+        }
+      } else if (currentTab === 'expense') {
+        if (!unitInput.value || unitInput.value === 'กล่อง' || unitInput.value === 'แก้ว') {
+          unitInput.value = 'กก.';
+        }
+      }
+
+      calculateTotal();
+    }
+
+    // 🧮 ฟังก์ชันเครื่องคิดเลข
+    let calcExpr = '0';
+    function toggleCalculator() {
+      const modal = document.getElementById('calc-modal');
+      modal.classList.toggle('hidden');
+    }
+
+    function calcInput(val) {
+      if (calcExpr === '0' && val !== '.') {
+        calcExpr = val;
+      } else {
+        calcExpr += val;
+      }
+      document.getElementById('calc-screen').value = calcExpr;
+    }
+
+    function calcClear() {
+      calcExpr = '0';
+      document.getElementById('calc-screen').value = calcExpr;
+    }
+
+    function calcBackspace() {
+      if (calcExpr.length > 1) {
+        calcExpr = calcExpr.slice(0, -1);
+      } else {
+        calcExpr = '0';
+      }
+      document.getElementById('calc-screen').value = calcExpr;
+    }
+
+    function calcEqual() {
+      try {
+        const result = eval(calcExpr);
+        calcExpr = String(result);
+        document.getElementById('calc-screen').value = calcExpr;
+      } catch (e) {
+        document.getElementById('calc-screen').value = 'Error';
+        calcExpr = '0';
+      }
+    }
+
+    // 🎙️ เสียงสั่งงาน
     let recognition = null;
     let isListening = false;
 
@@ -422,23 +566,10 @@
     }
 
     function toggleVoiceRecognition() {
-      if (!recognition) {
-        alert('เบราว์เซอร์ของคุณไม่รองรับการสั่งงานด้วยเสียง');
-        return;
-      }
-
-      if (isListening) {
-        recognition.stop();
-      } else {
-        try {
-          recognition.start();
-        } catch(e) {
-          recognition.stop();
-        }
-      }
+      if (!recognition) return alert('เบราว์เซอร์ของคุณไม่รองรับการสั่งงานด้วยเสียง');
+      if (isListening) { recognition.stop(); } else { try { recognition.start(); } catch(e) { recognition.stop(); } }
     }
 
-    // แปลงตัวเลขคำพูดภาษาไทยเป็นตัวเลขจริง
     function wordToNumber(str) {
       const numMap = {'หนึ่ง':1, 'สอง':2, 'สาม':3, 'สี่':4, 'ห้า':5, 'หก':6, 'เจ็ด':7, 'แปด':8, 'เก้า':9, 'สิบ':10};
       return numMap[str] || parseInt(str) || null;
@@ -448,10 +579,8 @@
       let qty = 1;
       let unit = 'กล่อง';
       let targetMenuName = '';
-
       const cleanText = text.trim();
 
-      // 1. ลองหาว่าตรงกับชื่อเมนูโดยตรงหรือไม่
       const allMenuNames = Object.keys(storeData.menuDetails);
       const matchedDirectName = allMenuNames.find(name => cleanText.includes(name));
 
@@ -463,15 +592,12 @@
           if (qtyMatch[2]) unit = qtyMatch[2];
         }
       } else {
-        // 2. ถ้าไม่เจอชื่อตรงๆ ค่อยเช็คว่าเป็นรหัสตัวเลขหรือไม่
         const firstWordMatch = cleanText.match(/^(\d+|หนึ่ง|สอง|สาม|สี่|ห้า|หก|เจ็ด|แปด|เก้า|สิบ)/);
         if (firstWordMatch) {
           const codeNum = wordToNumber(firstWordMatch[1]);
-          
           const foundEntry = Object.entries(storeData.menuDetails).find(([name, details]) => details.code && details.code == codeNum);
           if (foundEntry) {
             targetMenuName = foundEntry[0];
-
             const restText = cleanText.replace(firstWordMatch[0], '').trim();
             const qtyMatch = restText.match(/(\d+|หนึ่ง|สอง|สาม|สี่|ห้า|หก|เจ็ด|แปด|เก้า|สิบ)\s*(กล่อง|แก้ว|ชุด|ถุง|จาน|ขวด)?/);
             if (qtyMatch) {
@@ -482,7 +608,6 @@
         }
       }
 
-      // 3. ถ้ายังไม่พบเมนู ให้ดึงข้อความมาเป็นชื่อรายการตามปกติ
       if (!targetMenuName) {
         let name = cleanText;
         const qtyMatch = cleanText.match(/(\d+|หนึ่ง|สอง|สาม|สี่|ห้า|หก|เจ็ด|แปด|เก้า|สิบ)\s*(กล่อง|แก้ว|ชุด|ถุง|จาน|ขวด)?/);
@@ -497,59 +622,12 @@
 
       document.getElementById('item-name').value = targetMenuName;
       document.getElementById('item-qty').value = qty;
-      document.getElementById('item-unit').value = unit;
-
-      if (storeData.menuDetails[targetMenuName]) {
-        document.getElementById('item-price').value = storeData.menuDetails[targetMenuName].price;
-      } else {
-        autoFillPrice();
-      }
-
-      calculateTotal();
+      autoDetectUnitAndPrice();
+      if (qtyMatch && qtyMatch[2]) document.getElementById('item-unit').value = unit;
 
       if (storeData.menuDetails[targetMenuName] && currentTab === 'income') {
         addRecord();
       }
-    }
-
-    function editMenuCost(oldName) {
-      const current = storeData.menuDetails[oldName];
-      if (!current) return;
-
-      const newCode = prompt('แก้ไขรหัสเมนูด่วน (เว้นว่างไว้ได้หากไม่ต้องการใช้รหัส):', current.code !== undefined ? current.code : '');
-      if (newCode === null) return;
-
-      const newName = prompt('แก้ไขชื่อเมนูอาหาร:', oldName);
-      if (!newName || newName.trim() === '') return;
-
-      const newPrice = prompt('แก้ไขราคาขายจริง (บาท):', current.price);
-      if (newPrice === null) return;
-
-      const newCost = prompt('แก้ไขราคาต้นทุนวัตถุดิบ (บาท):', current.cost);
-      if (newCost === null) return;
-
-      if (newName.trim() !== oldName) {
-        delete storeData.menuDetails[oldName];
-      }
-
-      storeData.menuDetails[newName.trim()] = {
-        code: newCode.trim() !== '' ? parseInt(newCode) : '',
-        price: parseFloat(newPrice) || 0,
-        cost: parseFloat(newCost) || 0
-      };
-
-      saveData();
-    }
-
-    function selectQuickMenu(name) {
-      document.getElementById('item-name').value = name;
-      document.getElementById('item-qty').value = 1;
-      document.getElementById('item-unit').value = 'กล่อง';
-      if (storeData.menuDetails[name]) {
-        document.getElementById('item-price').value = storeData.menuDetails[name].price;
-      }
-      calculateTotal();
-      addRecord();
     }
 
     function switchTab(tab) {
@@ -559,8 +637,7 @@
         btn.classList.add('bg-white', 'text-gray-700');
       });
 
-      const btn = document.getElementById('tab-' + tab);
-      btn.classList.add('active');
+      document.getElementById('tab-' + tab).classList.add('active');
 
       const formSection = document.getElementById('form-section');
       const costSection = document.getElementById('cost-section');
@@ -571,6 +648,7 @@
 
       const nameLabel = document.getElementById('name-label');
       const submitBtn = document.getElementById('submit-btn');
+      const unitInput = document.getElementById('item-unit');
 
       if (tab === 'cost') {
         formSection.classList.add('hidden');
@@ -596,35 +674,18 @@
           nameLabel.innerText = 'เลือก/กรอกชื่อรายการอาหาร (หรือพิมพ์เลขรหัสสั่งสั้น):';
           submitBtn.innerText = '+ บันทึกรายรับ (ตัดสต๊อกอัตโนมัติ)';
           submitBtn.className = 'w-full bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold py-2.5 rounded-xl text-xs transition shadow';
+          unitInput.value = 'กล่อง';
         } else if (tab === 'expense') {
           if (realtimeDashboard) realtimeDashboard.classList.add('hidden');
           quickMenuBar.classList.add('hidden');
           nameLabel.innerText = 'ชื่อรายการซื้อของ / รายจ่ายของร้าน:';
           submitBtn.innerText = '+ บันทึกรายจ่าย';
           submitBtn.className = 'w-full bg-rose-600 hover:bg-rose-700 active:scale-95 text-white font-bold py-2.5 rounded-xl text-xs transition shadow';
+          unitInput.value = 'กก.';
         }
       }
 
       renderData();
-    }
-
-    function autoFillPrice() {
-      const inputVal = document.getElementById('item-name').value.trim();
-      let matchedName = inputVal;
-
-      // รองรับการพิมพ์แค่รหัสลงในช่องชื่อรายการ
-      if (!isNaN(inputVal) && inputVal !== '') {
-        const found = Object.entries(storeData.menuDetails).find(([n, d]) => d.code == inputVal);
-        if (found) {
-          matchedName = found[0];
-          document.getElementById('item-name').value = matchedName;
-        }
-      }
-
-      if (currentTab === 'income' && storeData.menuDetails[matchedName]) {
-        document.getElementById('item-price').value = storeData.menuDetails[matchedName].price;
-        calculateTotal();
-      }
     }
 
     function calculateTotal() {
@@ -647,10 +708,7 @@
       const price = parseFloat(document.getElementById('cost-menu-price').value) || 0;
       const cost = parseFloat(document.getElementById('cost-menu-cost').value) || 0;
 
-      if (!name || price <= 0) {
-        alert('กรุณากรอกชื่อเมนูและราคาขายให้ถูกต้อง');
-        return;
-      }
+      if (!name || price <= 0) return alert('กรุณากรอกชื่อเมนูและราคาขายให้ถูกต้อง');
 
       storeData.menuDetails[name] = { code, price, cost };
       alert(`บันทึกเมนู "${name}" (รหัส ${code}) เรียบร้อยแล้ว`);
@@ -676,28 +734,15 @@
 
       storeData.inventory.forEach(item => {
         let usage = 0;
+        if (item.id === 'pork' && (menuName.includes('หมูสับ') || menuName.includes('หมูชิ้น') || (menuName.includes('หมู') && !menuName.includes('กรอบ')))) usage = 0.08 * orderQty;
+        else if (item.id === 'chicken' && menuName.includes('ไก่')) usage = 0.08 * orderQty;
+        else if (item.id === 'pork_belly' && (menuName.includes('หมูกรอบ') || menuName.includes('สามชั้น'))) usage = 0.08 * orderQty;
+        else if (item.id === 'dory' && (menuName.includes('ดอลลี่') || menuName.includes('ปลา'))) usage = 0.20 * orderQty;
+        else if (item.id === 'shrimp' && (menuName.includes('ทะเล') || menuName.includes('กุ้ง'))) usage = 2 * orderQty;
+        else if (item.id === 'squid' && (menuName.includes('หมึก') || menuName.includes('ทะเล'))) usage = (menuName.includes('ทะเล') ? 1 : 2) * orderQty;
 
-        if (item.id === 'pork' && (menuName.includes('หมูสับ') || menuName.includes('หมูชิ้น') || (menuName.includes('หมู') && !menuName.includes('กรอบ')))) {
-          usage = 0.08 * orderQty;
-        } else if (item.id === 'chicken' && menuName.includes('ไก่')) {
-          usage = 0.08 * orderQty;
-        } else if (item.id === 'pork_belly' && (menuName.includes('หมูกรอบ') || menuName.includes('สามชั้น'))) {
-          usage = 0.08 * orderQty;
-        } else if (item.id === 'dory' && (menuName.includes('ดอลลี่') || menuName.includes('ปลา'))) {
-          usage = 0.20 * orderQty;
-        } else if (item.id === 'shrimp' && (menuName.includes('ทะเล') || menuName.includes('กุ้ง'))) {
-          usage = 2 * orderQty;
-        } else if (item.id === 'squid' && (menuName.includes('หมึก') || menuName.includes('ทะเล'))) {
-          usage = (menuName.includes('ทะเล') ? 1 : 2) * orderQty;
-        }
-
-        if (item.id === 'egg' && (menuName.includes('ข้าวผัด') || menuName.includes('สุกี้') || menuName.includes('ผัดซีอิ๊ว') || menuName.includes('ไข่'))) {
-          usage = 1 * orderQty;
-        }
-
-        if (item.id === 'rice' && !isBeverage && !menuName.includes('เกาเหลา')) {
-          usage = 0.10 * orderQty;
-        }
+        if (item.id === 'egg' && (menuName.includes('ข้าวผัด') || menuName.includes('สุกี้') || menuName.includes('ผัดซีอิ๊ว') || menuName.includes('ไข่'))) usage = 1 * orderQty;
+        if (item.id === 'rice' && !isBeverage && !menuName.includes('เกาเหลา')) usage = 0.10 * orderQty;
 
         if (!isBeverage) {
           if (item.id === 'sauce') usage = 0.02 * orderQty;
@@ -707,13 +752,9 @@
           if (item.id === 'box') usage = 1 * orderQty;
         }
 
-        if (item.id === 'cup' && isBeverage) {
-          usage = 1 * orderQty;
-        }
+        if (item.id === 'cup' && isBeverage) usage = 1 * orderQty;
 
-        if (usage > 0) {
-          item.qty = Math.max(0, item.qty - usage);
-        }
+        if (usage > 0) item.qty = Math.max(0, item.qty - usage);
       });
     }
 
@@ -725,10 +766,7 @@
       const price = parseFloat(document.getElementById('item-price').value) || 0;
       const total = qty * price;
 
-      if (!name || total <= 0) {
-        alert('กรุณากรอกชื่อรายการและจำนวน/ราคาให้ถูกต้อง');
-        return;
-      }
+      if (!name || total <= 0) return alert('กรุณากรอกชื่อรายการและจำนวน/ราคาให้ถูกต้อง');
 
       storeData.records.push({
         id: Date.now(),
@@ -741,76 +779,21 @@
         total: total
       });
 
-      if (currentTab === 'income') {
-        deductStockSmartly(name, qty);
-      }
+      if (currentTab === 'income') deductStockSmartly(name, qty);
 
       document.getElementById('item-name').value = '';
       document.getElementById('item-price').value = '';
       document.getElementById('item-total').value = '';
-      document.getElementById('item-unit').value = 'กล่อง';
+      document.getElementById('item-unit').value = currentTab === 'income' ? 'กล่อง' : 'กก.';
 
       saveData();
     }
 
-    function updateStock(id, amount) {
-      const item = storeData.inventory.find(i => i.id === id);
-      if (item) {
-        item.qty = Math.max(0, item.qty + amount);
-        saveData();
-      }
-    }
-
-    function addNewMaterial() {
-      const name = prompt('ชื่อวัตถุดิบใหม่:');
-      if (!name) return;
-      const cost = parseFloat(prompt('ต้นทุนต่อหน่วย (บาท):')) || 0;
-      const qty = parseFloat(prompt('จำนวนคงเหลือปัจจุบัน:')) || 0;
-      const unit = prompt('หน่วยนับ (กก./ฟอง/ลิตร/ถัง):') || 'กก.';
-
-      storeData.inventory.push({
-        id: 'mat_' + Date.now(),
-        name: name,
-        qty: qty,
-        unit: unit,
-        costPerUnit: cost,
-        alertThreshold: 1.0,
-        defaultUsage: 0.05
-      });
-
-      saveData();
-    }
-
-    function editMaterial(id) {
-      const item = storeData.inventory.find(i => i.id === id);
-      if (!item) return;
-
-      const newName = prompt('แก้ไขชื่อวัตถุดิบ:', item.name);
-      if (newName === null) return;
-
-      const newCost = prompt('แก้ไขต้นทุนต่อหน่วย (บาท):', item.costPerUnit || 0);
-      if (newCost === null) return;
-
-      const newQty = prompt('แก้ไขจำนวนคงเหลือปัจจุบัน:', item.qty || 0);
-      if (newQty === null) return;
-
-      const newUnit = prompt('แก้ไขหน่วยนับ:', item.unit || 'กก.');
-      if (newUnit === null) return;
-
-      item.name = newName.trim() || item.name;
-      item.costPerUnit = parseFloat(newCost) || 0;
-      item.qty = parseFloat(newQty) || 0;
-      item.unit = newUnit.trim() || item.unit;
-
-      saveData();
-    }
-
-    function deleteMaterial(id) {
-      const item = storeData.inventory.find(i => i.id === id);
-      if (item && confirm(`ต้องการลบวัตถุดิบ "${item.name}" ออกใช่หรือไม่?`)) {
-        storeData.inventory = storeData.inventory.filter(i => i.id !== id);
-        saveData();
-      }
+    function selectQuickMenu(name) {
+      document.getElementById('item-name').value = name;
+      document.getElementById('item-qty').value = 1;
+      autoDetectUnitAndPrice();
+      addRecord();
     }
 
     function deleteRecord(id) {
@@ -820,38 +803,58 @@
       }
     }
 
-    // คำนวณสรุปยอดขาย เรียลไทม์ (รายวัน / รายสัปดาห์ / รายเดือน)
+    // 🔍 คำนวณสรุปยอดขายตามช่วงเวลาอิสระ (Custom Range)
+    function calculateCustomRange() {
+      const startDate = document.getElementById('range-start-date').value;
+      const endDate = document.getElementById('range-end-date').value;
+
+      if (!startDate || !endDate) return;
+
+      let salesSum = 0;
+      let expenseSum = 0;
+
+      const sDate = new Date(startDate);
+      const eDate = new Date(endDate);
+      const diffTime = Math.abs(eDate - sDate);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+      storeData.records.forEach(r => {
+        if (r.date >= startDate && r.date <= endDate) {
+          if (r.type === 'income') salesSum += r.total;
+          if (r.type === 'expense') expenseSum += r.total;
+        }
+      });
+
+      const netProfit = salesSum - expenseSum;
+      const avgDaily = diffDays > 0 ? (salesSum / diffDays) : 0;
+
+      document.getElementById('cr-sales').innerText = `฿${salesSum.toLocaleString()}`;
+      document.getElementById('cr-expense').innerText = `฿${expenseSum.toLocaleString()}`;
+      document.getElementById('cr-profit').innerText = `฿${netProfit.toLocaleString()}`;
+      document.getElementById('cr-avg-daily').innerText = `฿${Math.round(avgDaily).toLocaleString()}`;
+    }
+
+    // คำนวณ Dashboard ยอดขายเรียลไทม์
     function updateRealtimeSalesDashboard() {
       const now = new Date();
       const today = now.toISOString().split('T')[0];
       const currentMonth = today.substring(0, 7);
 
-      // หาวันจันทร์ของสัปดาห์นี้
-      const dayOfWeek = now.getDay() || 7; // 1=Mon, 7=Sun
+      const dayOfWeek = now.getDay() || 7;
       const mondayDate = new Date(now);
       mondayDate.setDate(now.getDate() - dayOfWeek + 1);
       mondayDate.setHours(0, 0, 0, 0);
 
-      let dSales = 0;
-      let wSales = 0;
-      let mSales = 0;
-      let todayCount = 0;
+      let dSales = 0, wSales = 0, mSales = 0, todayCount = 0;
 
       storeData.records.forEach(r => {
         if (r.type === 'income') {
           const rDate = new Date(r.date + 'T00:00:00');
           const amt = r.total || 0;
 
-          if (r.date === today) {
-            dSales += amt;
-            todayCount += 1;
-          }
-          if (rDate >= mondayDate && rDate <= now) {
-            wSales += amt;
-          }
-          if (r.date.startsWith(currentMonth)) {
-            mSales += amt;
-          }
+          if (r.date === today) { dSales += amt; todayCount += 1; }
+          if (rDate >= mondayDate && rDate <= now) { wSales += amt; }
+          if (r.date.startsWith(currentMonth)) { mSales += amt; }
         }
       });
 
@@ -859,10 +862,11 @@
       document.getElementById('rt-weekly-sales').innerText = `฿${wSales.toLocaleString()}`;
       document.getElementById('rt-monthly-sales').innerText = `฿${mSales.toLocaleString()}`;
       document.getElementById('rt-today-orders').innerText = `${todayCount} รายการวันนี้`;
+
+      calculateCustomRange();
     }
 
     function renderData() {
-      // อัปเดตการ์ดสรุปยอดขายเรียลไทม์
       updateRealtimeSalesDashboard();
 
       const filterDate = document.getElementById('filter-date').value;
@@ -871,12 +875,9 @@
       tbody.innerHTML = '';
       tfoot.innerHTML = '';
 
-      let incomeSum = 0;
-      let expenseSum = 0;
-      let menuCostSum = 0;
+      let incomeSum = 0, expenseSum = 0, menuCostSum = 0;
       let menuSalesCount = {};
 
-      // สรุปยอดรวมประจำวัน
       const allFiltered = storeData.records.filter(r => r.date === filterDate);
       allFiltered.forEach(item => {
         if (item.type === 'income') {
@@ -889,7 +890,6 @@
         }
       });
 
-      // กรองตามแท็บ + เรียงลำดับจากใหม่ไปเก่า
       let tabFiltered = [];
       if (currentTab === 'income') {
         tabFiltered = allFiltered.filter(r => r.type === 'income').sort((a, b) => b.id - a.id);
@@ -903,9 +903,7 @@
         const isIncome = item.type === 'income';
         tbody.innerHTML += `
           <tr class="hover:bg-gray-50">
-            <td class="p-2.5 font-bold ${isIncome ? 'text-blue-600' : 'text-rose-500'}">
-              ${isIncome ? 'รายรับ' : 'รายจ่าย'}
-            </td>
+            <td class="p-2.5 font-bold ${isIncome ? 'text-blue-600' : 'text-rose-500'}">${isIncome ? 'รายรับ' : 'รายจ่าย'}</td>
             <td class="p-2.5 font-medium text-gray-800">${item.name}</td>
             <td class="p-2.5 text-center text-gray-600">${item.qty} ${item.unit}</td>
             <td class="p-2.5 text-right font-semibold text-gray-900">${item.total.toLocaleString()} บ.</td>
@@ -917,10 +915,9 @@
       });
 
       if (tabFiltered.length === 0 && (currentTab === 'income' || currentTab === 'expense')) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-400">ไม่มีรายการ${currentTab === 'income' ? 'รายรับ' : 'รายจ่าย'}ในวันที่เลือก</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-400">ไม่มีรายการในวันที่เลือก</td></tr>`;
       }
 
-      // ยอดสรุปรวมท้ายตาราง
       if (currentTab === 'income') {
         tfoot.innerHTML = `
           <tr class="text-emerald-700 bg-emerald-50/70">
@@ -939,7 +936,7 @@
         `;
       }
 
-      // แสดงแถบปุ่มเมนูด่วน ( Quick Code Shortcuts )
+      // แสดงปุ่มเมนูด่วน
       const quickButtonsContainer = document.getElementById('quick-menu-buttons');
       quickButtonsContainer.innerHTML = '';
       const sortedMenusByCode = Object.entries(storeData.menuDetails).sort((a, b) => (a[1].code || 99) - (b[1].code || 99));
@@ -960,9 +957,6 @@
       datalist.innerHTML = '';
 
       sortedMenusByCode.forEach(([name, details]) => {
-        const profit = details.price - details.cost;
-        const margin = details.price > 0 ? ((profit / details.price) * 100).toFixed(0) : 0;
-
         datalist.innerHTML += `<option value="${name}">`;
         if (details.code) datalist.innerHTML += `<option value="${details.code}">`;
 
@@ -973,76 +967,57 @@
             <td class="p-2 text-right text-emerald-600 font-semibold">฿${details.price}</td>
             <td class="p-2 text-right text-rose-500">฿${details.cost}</td>
             <td class="p-2 text-center flex justify-center gap-2">
-              <button onclick="editMenuCost('${name}')" title="แก้ไขรายการนี้" class="text-blue-500 hover:text-blue-700">✏️</button>
-              <button onclick="deleteMenuCost('${name}')" title="ลบรายการนี้" class="text-gray-400 hover:text-rose-600">❌</button>
+              <button onclick="deleteMenuCost('${name}')" title="ลบ" class="text-gray-400 hover:text-rose-600">❌</button>
             </td>
           </tr>
         `;
       });
 
-      // แจ้งเตือนวัตถุดิบใกล้หมด
+      // แจ้งเตือนวัตถุดิบ
       const alertList = document.getElementById('stock-alert-list');
       alertList.innerHTML = '';
       let hasAlert = false;
 
       storeData.inventory.forEach(item => {
         const safeQty = item.qty || 0;
-        const safeThreshold = item.alertThreshold || 1.0;
-        const safeUsage = item.defaultUsage || 0.08;
-
-        if (safeQty <= safeThreshold) {
+        if (safeQty <= (item.alertThreshold || 1.0)) {
           hasAlert = true;
-          const dishesLeft = Math.floor(safeQty / safeUsage);
-          const isCritical = dishesLeft < 8;
-          
+          const dishesLeft = Math.floor(safeQty / (item.defaultUsage || 0.08));
           alertList.innerHTML += `
             <div class="bg-white p-2.5 rounded-lg border border-amber-200 flex justify-between items-center text-xs shadow-sm">
               <div>
                 <p class="font-bold text-gray-800">${item.name}</p>
-                <p class="text-gray-500">เหลือ ${safeQty.toFixed(2)} ${item.unit} (ทำขายได้อีก ~${dishesLeft} ${item.unit === 'ถัง' ? 'วัน' : 'กล่อง/ชุด'})</p>
+                <p class="text-gray-500">เหลือ ${safeQty.toFixed(2)} ${item.unit} (~${dishesLeft} กล่อง)</p>
               </div>
-              <span class="px-2 py-1 ${isCritical ? 'bg-rose-100 text-rose-700 border border-rose-200' : 'bg-amber-100 text-amber-800 border border-amber-200'} rounded font-bold text-[11px]">
-                ${isCritical ? 'ต้องซื้อเพิ่ม' : 'ใกล้หมด'}
-              </span>
+              <span class="px-2 py-1 bg-amber-100 text-amber-800 border border-amber-200 rounded font-bold text-[11px]">ใกล้หมด</span>
             </div>
           `;
         }
       });
-
       document.getElementById('stock-alert-box').style.display = hasAlert ? 'block' : 'none';
 
-      // รายการสต๊อกวัตถุดิบ
+      // สต๊อกวัตถุดิบ
       const stockList = document.getElementById('stock-items-list');
       stockList.innerHTML = '';
-
       storeData.inventory.forEach(item => {
-        const safeQty = item.qty || 0;
-        const safeCost = item.costPerUnit || 0;
-
         stockList.innerHTML += `
           <div class="bg-gray-50 p-3 rounded-lg border border-gray-200 flex justify-between items-center">
             <div>
-              <div class="flex items-center gap-1.5">
-                <p class="font-bold text-gray-800">${item.name}</p>
-                <button onclick="editMaterial('${item.id}')" title="แก้ไข" class="text-xs text-blue-500 hover:text-blue-700">✏</button>
-                <button onclick="deleteMaterial('${item.id}')" title="ลบ" class="text-xs text-gray-400 hover:text-rose-600">❌</button>
-              </div>
-              <p class="text-xs text-gray-500">ต้นทุน: ฿${safeCost} / ${item.unit}</p>
+              <p class="font-bold text-gray-800">${item.name}</p>
+              <p class="text-xs text-gray-500">ต้นทุน: ฿${item.costPerUnit || 0} / ${item.unit}</p>
             </div>
             <div class="text-right">
-              <p class="font-bold ${safeQty <= (item.alertThreshold || 1) ? 'text-amber-600' : 'text-emerald-600'}">
-                ${safeQty.toFixed(2)} ${item.unit}
-              </p>
+              <p class="font-bold ${(item.qty || 0) <= (item.alertThreshold || 1) ? 'text-amber-600' : 'text-emerald-600'}">${(item.qty || 0).toFixed(2)} ${item.unit}</p>
               <div class="flex gap-1 mt-1">
-                <button onclick="updateStock('${item.id}', 1)" class="px-2 py-0.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs rounded font-medium">+ รับเข้า</button>
-                <button onclick="updateStock('${item.id}', -1)" class="px-2 py-0.5 bg-rose-600 hover:bg-rose-700 text-white text-xs rounded font-medium">- ของเสีย</button>
+                <button onclick="updateStock('${item.id}', 1)" class="px-2 py-0.5 bg-emerald-600 text-white text-xs rounded font-medium">+ รับเข้า</button>
+                <button onclick="updateStock('${item.id}', -1)" class="px-2 py-0.5 bg-rose-600 text-white text-xs rounded font-medium">- ลดลง</button>
               </div>
             </div>
           </div>
         `;
       });
 
-      // คำนวณภาพรวมกำไรขาดทุน
+      // ผลประกอบการ
       const netProfit = incomeSum - menuCostSum - expenseSum;
       const margin = incomeSum > 0 ? ((netProfit / incomeSum) * 100).toFixed(1) : 0;
 
@@ -1054,21 +1029,15 @@
 
       const uniqueDays = [...new Set(storeData.records.filter(r => r.type === 'income').map(r => r.date))].length || 1;
       const totalAllIncome = storeData.records.filter(r => r.type === 'income').reduce((acc, r) => acc + r.total, 0);
-      const avgDaily = (totalAllIncome / uniqueDays).toFixed(0);
-      document.getElementById('avg-daily-sales').innerText = `${parseInt(avgDaily).toLocaleString()} บ. / วัน`;
+      document.getElementById('avg-daily-sales').innerText = `${parseInt((totalAllIncome / uniqueDays).toFixed(0)).toLocaleString()} บ. / วัน`;
 
-      // วิเคราะห์ขายดีที่สุด
+      // วิเคราะห์เมนู
       const topSellingContainer = document.getElementById('top-selling-list');
       const sortedSelling = Object.entries(menuSalesCount).sort((a, b) => b[1] - a[1]);
-      if (sortedSelling.length > 0) {
-        topSellingContainer.innerHTML = sortedSelling.slice(0, 3).map((item, idx) => 
-          `<p class="font-medium">${idx + 1}. ${item[0]} (${item[1]} กล่อง)</p>`
-        ).join('');
-      } else {
-        topSellingContainer.innerHTML = '- ยังไม่มียอดขายวันนี้ -';
-      }
+      topSellingContainer.innerHTML = sortedSelling.length > 0 
+        ? sortedSelling.slice(0, 3).map((item, idx) => `<p class="font-medium">${idx + 1}. ${item[0]} (${item[1]} กล่อง)</p>`).join('') 
+        : '- ยังไม่มีข้อมูล -';
 
-      // เมนูกำไรสูงสุด
       const topProfitContainer = document.getElementById('top-profit-list');
       const menuProfitList = Object.entries(storeData.menuDetails).map(([name, details]) => {
         const profit = details.price - details.cost;
@@ -1076,16 +1045,27 @@
         return { name, marginPct };
       }).sort((a, b) => b.marginPct - a.marginPct);
 
-      if (menuProfitList.length > 0) {
-        topProfitContainer.innerHTML = menuProfitList.slice(0, 3).map((item, idx) => 
-          `<p class="font-medium">${idx + 1}. ${item.name} (${item.marginPct}%)</p>`
-        ).join('');
-      } else {
-        topProfitContainer.innerHTML = '- ไม่มีข้อมูล -';
-      }
+      topProfitContainer.innerHTML = menuProfitList.length > 0 
+        ? menuProfitList.slice(0, 3).map((item, idx) => `<p class="font-medium">${idx + 1}. ${item.name} (${item.marginPct}%)</p>`).join('') 
+        : '- ไม่มีข้อมูล -';
     }
 
-    // เรียกทำงานเริ่มต้น
+    function updateStock(id, amount) {
+      const item = storeData.inventory.find(i => i.id === id);
+      if (item) { item.qty = Math.max(0, item.qty + amount); saveData(); }
+    }
+
+    function addNewMaterial() {
+      const name = prompt('ชื่อวัตถุดิบใหม่:');
+      if (!name) return;
+      const cost = parseFloat(prompt('ต้นทุนต่อหน่วย (บาท):')) || 0;
+      const qty = parseFloat(prompt('จำนวนคงเหลือปัจจุบัน:')) || 0;
+      const unit = prompt('หน่วยนับ (กก./ฟอง/ลิตร):') || 'กก.';
+
+      storeData.inventory.push({ id: 'mat_' + Date.now(), name, qty, unit, costPerUnit: cost, alertThreshold: 1.0, defaultUsage: 0.05 });
+      saveData();
+    }
+
     renderData();
   </script>
 </body>
