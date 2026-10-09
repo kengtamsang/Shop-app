@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>เก่งตามสั่ง - บัญชี สต๊อก & วิเคราะห์ยอดขาย</title>
+  <title>เก่งตามสั่ง - บัญชี สต๊อก & วิเคราะห์ยอดขาย AI</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <style>
@@ -30,6 +30,13 @@
       color: white !important;
       border-color: #dc2626 !important;
     }
+    @keyframes ai-glow {
+      0%, 100% { box-shadow: 0 0 15px rgba(124, 58, 237, 0.5); }
+      50% { box-shadow: 0 0 25px rgba(99, 102, 241, 0.8); }
+    }
+    .ai-btn-glow {
+      animation: ai-glow 3s infinite;
+    }
   </style>
 </head>
 <body class="pb-16">
@@ -41,7 +48,9 @@
       <h1 class="text-lg font-bold text-blue-600 flex items-center gap-2">
         <i class="fa-solid fa-utensils"></i> เก่งตามสั่ง - สต๊อก & กำไร
       </h1>
-      <span class="text-xs bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full font-semibold">v16.0 Analytics ⚡</span>
+      <span class="text-xs bg-indigo-100 text-indigo-700 px-2.5 py-1 rounded-full font-semibold flex items-center gap-1">
+        <i class="fa-solid fa-robot"></i> v16.0 AI ⚡
+      </span>
     </header>
 
     <!-- Navigation Tabs -->
@@ -87,7 +96,7 @@
           </div>
         </div>
 
-        <!-- 🔍 ส่วนค้นหาย้อนหลังแบบกำหนดวันเอง (Custom Range Filter) -->
+        <!-- 🔍 ส่วนค้นหาย้อนหลังแบบกำหนดวันเอง -->
         <div class="bg-white/10 backdrop-blur-md p-2.5 rounded-lg border border-white/20 space-y-2 text-xs">
           <p class="font-bold text-[11px] text-yellow-200 flex items-center gap-1">
             <i class="fa-solid fa-calendar-days"></i> เช็คยอดขายย้อนหลังอิสระ (เช่น วันที่ 1-7 หรือเดือนที่แล้ว):
@@ -338,49 +347,70 @@
 
     </main>
 
-    <!-- 🧮 Floating Calculator Button & Modal -->
-    <button onclick="toggleCalculator()" class="fixed bottom-5 right-5 w-14 h-14 bg-amber-500 hover:bg-amber-600 text-white rounded-full flex items-center justify-center shadow-lg active:scale-95 transition-all z-50">
-      <i class="fa-solid fa-calculator text-2xl"></i>
+    <!-- 🤖 Floating AI Assistant Button (ปุ่มลอย AI) -->
+    <button onclick="toggleAIModal()" class="fixed bottom-5 right-5 w-14 h-14 bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 text-white rounded-full flex items-center justify-center shadow-xl active:scale-95 transition-all z-50 ai-btn-glow">
+      <i class="fa-solid fa-robot text-2xl"></i>
     </button>
 
-    <!-- Modal เครื่องคิดเลข -->
-    <div id="calc-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
-      <div class="bg-white w-full max-w-xs rounded-2xl p-4 shadow-2xl space-y-3">
-        <div class="flex justify-between items-center border-b pb-2">
-          <h3 class="font-bold text-gray-800 text-sm flex items-center gap-1.5">
-            <i class="fa-solid fa-calculator text-amber-500"></i> เครื่องคิดเลขด่วน
-          </h3>
-          <button onclick="toggleCalculator()" class="text-gray-400 hover:text-gray-700 font-bold text-lg">&times;</button>
+    <!-- Modal AI Assistant (หน้าต่างวิเคราะห์การเงินและที่ปรึกษาร้าน) -->
+    <div id="ai-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+      <div class="bg-white w-full max-w-sm rounded-2xl p-4 shadow-2xl space-y-3 max-h-[85vh] flex flex-col">
+        
+        <!-- Modal Header -->
+        <div class="flex justify-between items-center border-b pb-2.5">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white flex items-center justify-center text-sm font-bold shadow">
+              <i class="fa-solid fa-brain"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-gray-800 text-sm">AI ที่ปรึกษาบัญชีร้าน</h3>
+              <p class="text-[10px] text-gray-500">วิเคราะห์ข้อมูลสดจากบัญชี & สต๊อก</p>
+            </div>
+          </div>
+          <button onclick="toggleAIModal()" class="text-gray-400 hover:text-gray-700 font-bold text-xl px-1">&times;</button>
         </div>
 
-        <div class="bg-gray-100 p-3 rounded-xl text-right">
-          <input type="text" id="calc-screen" value="0" readonly class="w-full bg-transparent text-right text-2xl font-bold text-gray-800 focus:outline-none">
+        <!-- AI Insight Screen -->
+        <div class="flex-1 overflow-y-auto space-y-3 pr-1 text-xs">
+          <div class="bg-indigo-50 border border-indigo-100 p-3 rounded-xl space-y-1">
+            <p class="font-bold text-indigo-900 flex items-center gap-1">
+              <i class="fa-solid fa-wand-magic-sparkles text-indigo-600"></i> สถานะสุขภาพการเงินร้านปัจจุบัน:
+            </p>
+            <p id="ai-health-status" class="text-gray-700 leading-relaxed text-[11px]">
+              กดปุ่มด้านล่างเพื่อให้ AI รวบรวมข้อมูลรายการขายและสต๊อกมาประมวลผลทันที
+            </p>
+          </div>
+
+          <!-- กล่องคำแนะนำด่วน -->
+          <div class="space-y-2">
+            <p class="font-bold text-gray-700 text-[11px] flex items-center gap-1">
+              <i class="fa-solid fa-lightbulb text-amber-500"></i> หัวข้อวิเคราะห์ฉลาด:
+            </p>
+            <div class="grid grid-cols-1 gap-1.5">
+              <button onclick="runAIAnalysis('sales')" class="w-full text-left bg-white hover:bg-purple-50 border border-gray-200 p-2.5 rounded-xl flex items-center justify-between text-[11px] text-gray-800 shadow-sm transition">
+                <span>📈 พยากรณ์ยอดขาย & วิเคราะห์เมนูทำเงิน</span>
+                <i class="fa-solid fa-chevron-right text-gray-400"></i>
+              </button>
+              <button onclick="runAIAnalysis('cost')" class="w-full text-left bg-white hover:bg-purple-50 border border-gray-200 p-2.5 rounded-xl flex items-center justify-between text-[11px] text-gray-800 shadow-sm transition">
+                <span>⚠️ ตรวจสอบจุดเสี่ยงต้นทุน & รายจ่ายสูง</span>
+                <i class="fa-solid fa-chevron-right text-gray-400"></i>
+              </button>
+              <button onclick="runAIAnalysis('stock')" class="w-full text-left bg-white hover:bg-purple-50 border border-gray-200 p-2.5 rounded-xl flex items-center justify-between text-[11px] text-gray-800 shadow-sm transition">
+                <span>📦 วางแผนสั่งซื้อวัตถุดิบและตัดสต๊อก</span>
+                <i class="fa-solid fa-chevron-right text-gray-400"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- แสดงผลคำวิเคราะห์ -->
+          <div id="ai-result-box" class="hidden bg-gray-50 p-3 rounded-xl border border-gray-200 text-[11px] text-gray-800 space-y-2 leading-relaxed"></div>
         </div>
 
-        <div class="grid grid-cols-4 gap-2 text-sm font-bold">
-          <button onclick="calcClear()" class="bg-rose-100 text-rose-600 p-3 rounded-xl hover:bg-rose-200 active:scale-95">C</button>
-          <button onclick="calcInput('/')" class="bg-amber-100 text-amber-700 p-3 rounded-xl hover:bg-amber-200 active:scale-95">÷</button>
-          <button onclick="calcInput('*')" class="bg-amber-100 text-amber-700 p-3 rounded-xl hover:bg-amber-200 active:scale-95">×</button>
-          <button onclick="calcBackspace()" class="bg-gray-200 text-gray-700 p-3 rounded-xl hover:bg-gray-300 active:scale-95"><i class="fa-solid fa-backspace"></i></button>
+        <!-- Modal Footer -->
+        <button onclick="runAIAnalysis('full')" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-md active:scale-95 transition flex items-center justify-center gap-2">
+          <i class="fa-solid fa-bolt"></i> วิเคราะห์ภาพรวมร้านทั้งหมด (Realtime)
+        </button>
 
-          <button onclick="calcInput('7')" class="bg-gray-100 p-3 rounded-xl hover:bg-gray-200 active:scale-95">7</button>
-          <button onclick="calcInput('8')" class="bg-gray-100 p-3 rounded-xl hover:bg-gray-200 active:scale-95">8</button>
-          <button onclick="calcInput('9')" class="bg-gray-100 p-3 rounded-xl hover:bg-gray-200 active:scale-95">9</button>
-          <button onclick="calcInput('-')" class="bg-amber-100 text-amber-700 p-3 rounded-xl hover:bg-amber-200 active:scale-95">-</button>
-
-          <button onclick="calcInput('4')" class="bg-gray-100 p-3 rounded-xl hover:bg-gray-200 active:scale-95">4</button>
-          <button onclick="calcInput('5')" class="bg-gray-100 p-3 rounded-xl hover:bg-gray-200 active:scale-95">5</button>
-          <button onclick="calcInput('6')" class="bg-gray-100 p-3 rounded-xl hover:bg-gray-200 active:scale-95">6</button>
-          <button onclick="calcInput('+')" class="bg-amber-100 text-amber-700 p-3 rounded-xl hover:bg-amber-200 active:scale-95">+</button>
-
-          <button onclick="calcInput('1')" class="bg-gray-100 p-3 rounded-xl hover:bg-gray-200 active:scale-95">1</button>
-          <button onclick="calcInput('2')" class="bg-gray-100 p-3 rounded-xl hover:bg-gray-200 active:scale-95">2</button>
-          <button onclick="calcInput('3')" class="bg-gray-100 p-3 rounded-xl hover:bg-gray-200 active:scale-95">3</button>
-          <button onclick="calcEqual()" class="row-span-2 bg-amber-500 text-white rounded-xl hover:bg-amber-600 active:scale-95 flex items-center justify-center text-xl">=</button>
-
-          <button onclick="calcInput('0')" class="col-span-2 bg-gray-100 p-3 rounded-xl hover:bg-gray-200 active:scale-95">0</button>
-          <button onclick="calcInput('.')" class="bg-gray-100 p-3 rounded-xl hover:bg-gray-200 active:scale-95">.</button>
-        </div>
       </div>
     </div>
 
@@ -393,7 +423,6 @@
     document.getElementById('record-date').value = todayStr;
     document.getElementById('filter-date').value = todayStr;
 
-    // กำหนดค่าเริ่มต้นช่วงวันเช็คย้อนหลัง (ย้อนหลัง 7 วัน)
     const d7Ago = new Date();
     d7Ago.setDate(d7Ago.getDate() - 6);
     document.getElementById('range-start-date').value = d7Ago.toISOString().split('T')[0];
@@ -449,13 +478,55 @@
       renderData();
     }
 
-    // 🏷️ ตรวจจับหน่วยนับอัตโนมัติ (Smart Auto Unit Detection)
+    // 🤖 ระบบ AI Assistant
+    function toggleAIModal() {
+      const modal = document.getElementById('ai-modal');
+      modal.classList.toggle('hidden');
+    }
+
+    function runAIAnalysis(mode) {
+      const resultBox = document.getElementById('ai-result-box');
+      const healthStatus = document.getElementById('ai-health-status');
+      resultBox.classList.remove('hidden');
+      resultBox.innerHTML = `<p class="text-purple-600 font-bold animate-pulse"><i class="fa-solid fa-spinner fa-spin mr-1"></i> AI กำลังประมวลผลข้อมูลบัญชีร้านของคุณ...</p>`;
+
+      setTimeout(() => {
+        let incomeTotal = storeData.records.filter(r => r.type === 'income').reduce((acc, r) => acc + r.total, 0);
+        let expenseTotal = storeData.records.filter(r => r.type === 'expense').reduce((acc, r) => acc + r.total, 0);
+        let netProfit = incomeTotal - expenseTotal;
+        let margin = incomeTotal > 0 ? ((netProfit / incomeTotal) * 100).toFixed(1) : 0;
+        let lowStockCount = storeData.inventory.filter(i => (i.qty || 0) <= (i.alertThreshold || 1.0)).length;
+
+        healthStatus.innerHTML = `ยอดขายรวม: <strong>฿${incomeTotal.toLocaleString()}</strong> | กำไรสุทธิ: <strong class="text-emerald-600">฿${netProfit.toLocaleString()}</strong> (${margin}%)`;
+
+        if (mode === 'sales' || mode === 'full') {
+          resultBox.innerHTML = `
+            <p class="font-bold text-purple-900 border-b pb-1"><i class="fa-solid fa-chart-line text-purple-600"></i> ผลวิเคราะห์ยอดขาย & เมนูทำเงิน:</p>
+            <p>• <strong>อัตรากำไร (Margin):</strong> อยู่ที่ ${margin}% ${margin > 30 ? '🟢 (เกณฑ์ดีมาก)' : '🟡 (ควรควบคุมต้นทุนเพิ่ม)'}</p>
+            <p>• <strong>คำแนะนำ:</strong> ดันเมนูกำไรสูง เช่น กะเพราหมูสับ/ไก่ ร่วมกับเครื่องดื่มเย็น เพื่อเพิ่มยอดขายต่อออเดอร์ให้สูงขึ้น</p>
+          `;
+        } else if (mode === 'cost') {
+          resultBox.innerHTML = `
+            <p class="font-bold text-purple-900 border-b pb-1"><i class="fa-solid fa-shield-halved text-rose-500"></i> วิเคราะห์จุดเสี่ยงต้นทุน:</p>
+            <p>• <strong>รายจ่ายรวมสะสม:</strong> ฿${expenseTotal.toLocaleString()}</p>
+            <p>• <strong>ข้อควรระวัง:</strong> เช็คราคาหมูกรอบ/เนื้อสัตว์สด สัปดาห์ต่อสัปดาห์ หากต้นทุนเกิน 45% ของราคาขาย แนะนำปรับปริมาณสัดส่วนวัตถุดิบลง 5%</p>
+          `;
+        } else if (mode === 'stock') {
+          resultBox.innerHTML = `
+            <p class="font-bold text-purple-900 border-b pb-1"><i class="fa-solid fa-boxes-stacked text-amber-500"></i> วางแผนสต๊อกวัตถุดิบ:</p>
+            <p>• <strong>วัตถุดิบใกล้หมด:</strong> มีทั้งหมด <span class="text-rose-600 font-bold">${lowStockCount} รายการ</span> ที่ต้องรีบเติม</p>
+            <p>• <strong>คำแนะนำสั่งซื้อ:</strong> ควรสั่งหมูสด ข้าวสาร และกล่องอาหารสำรองล่วงหน้าอย่างน้อย 2 วันก่อนช่วงวันหยุดสุดสัปดาห์</p>
+          `;
+        }
+      }, 600);
+    }
+
+    // 🏷️ ตรวจจับหน่วยนับอัตโนมัติ
     function autoDetectUnitAndPrice() {
       const nameInput = document.getElementById('item-name');
       const unitInput = document.getElementById('item-unit');
       let val = nameInput.value.trim();
 
-      // เช็คว่าเป็นรหัสเมนูด่วนหรือไม่
       if (!isNaN(val) && val !== '') {
         const found = Object.entries(storeData.menuDetails).find(([n, d]) => d.code == val);
         if (found) {
@@ -464,12 +535,10 @@
         }
       }
 
-      // ดึงราคาขาย
       if (currentTab === 'income' && storeData.menuDetails[val]) {
         document.getElementById('item-price').value = storeData.menuDetails[val].price;
       }
 
-      // ปรับหน่วยนับอัตโนมัติ
       if (currentTab === 'income') {
         const beverageKeywords = ['น้ำ', 'ชา', 'กาแฟ', 'โซดา', 'นม', 'เป๊ปซี่', 'โค้ก', 'สไปรท์', 'โอเลี้ยง'];
         const dishKeywords = ['กับข้าว', 'ถุง', 'ต้ม', 'แกง', 'กับ', 'แกงจืด', 'ต้มยำ'];
@@ -488,47 +557,6 @@
       }
 
       calculateTotal();
-    }
-
-    // 🧮 ฟังก์ชันเครื่องคิดเลข
-    let calcExpr = '0';
-    function toggleCalculator() {
-      const modal = document.getElementById('calc-modal');
-      modal.classList.toggle('hidden');
-    }
-
-    function calcInput(val) {
-      if (calcExpr === '0' && val !== '.') {
-        calcExpr = val;
-      } else {
-        calcExpr += val;
-      }
-      document.getElementById('calc-screen').value = calcExpr;
-    }
-
-    function calcClear() {
-      calcExpr = '0';
-      document.getElementById('calc-screen').value = calcExpr;
-    }
-
-    function calcBackspace() {
-      if (calcExpr.length > 1) {
-        calcExpr = calcExpr.slice(0, -1);
-      } else {
-        calcExpr = '0';
-      }
-      document.getElementById('calc-screen').value = calcExpr;
-    }
-
-    function calcEqual() {
-      try {
-        const result = eval(calcExpr);
-        calcExpr = String(result);
-        document.getElementById('calc-screen').value = calcExpr;
-      } catch (e) {
-        document.getElementById('calc-screen').value = 'Error';
-        calcExpr = '0';
-      }
     }
 
     // 🎙️ เสียงสั่งงาน
@@ -803,7 +831,6 @@
       }
     }
 
-    // 🔍 คำนวณสรุปยอดขายตามช่วงเวลาอิสระ (Custom Range)
     function calculateCustomRange() {
       const startDate = document.getElementById('range-start-date').value;
       const endDate = document.getElementById('range-end-date').value;
@@ -834,7 +861,6 @@
       document.getElementById('cr-avg-daily').innerText = `฿${Math.round(avgDaily).toLocaleString()}`;
     }
 
-    // คำนวณ Dashboard ยอดขายเรียลไทม์
     function updateRealtimeSalesDashboard() {
       const now = new Date();
       const today = now.toISOString().split('T')[0];
@@ -936,7 +962,6 @@
         `;
       }
 
-      // แสดงปุ่มเมนูด่วน
       const quickButtonsContainer = document.getElementById('quick-menu-buttons');
       quickButtonsContainer.innerHTML = '';
       const sortedMenusByCode = Object.entries(storeData.menuDetails).sort((a, b) => (a[1].code || 99) - (b[1].code || 99));
@@ -950,7 +975,6 @@
         `;
       });
 
-      // ตารางตั้งค่าเมนูหลังบ้าน
       const menuTable = document.getElementById('menu-cost-table-body');
       const datalist = document.getElementById('menu-suggestions');
       menuTable.innerHTML = '';
@@ -973,7 +997,6 @@
         `;
       });
 
-      // แจ้งเตือนวัตถุดิบ
       const alertList = document.getElementById('stock-alert-list');
       alertList.innerHTML = '';
       let hasAlert = false;
@@ -996,7 +1019,6 @@
       });
       document.getElementById('stock-alert-box').style.display = hasAlert ? 'block' : 'none';
 
-      // สต๊อกวัตถุดิบ
       const stockList = document.getElementById('stock-items-list');
       stockList.innerHTML = '';
       storeData.inventory.forEach(item => {
@@ -1017,7 +1039,6 @@
         `;
       });
 
-      // ผลประกอบการ
       const netProfit = incomeSum - menuCostSum - expenseSum;
       const margin = incomeSum > 0 ? ((netProfit / incomeSum) * 100).toFixed(1) : 0;
 
@@ -1031,7 +1052,6 @@
       const totalAllIncome = storeData.records.filter(r => r.type === 'income').reduce((acc, r) => acc + r.total, 0);
       document.getElementById('avg-daily-sales').innerText = `${parseInt((totalAllIncome / uniqueDays).toFixed(0)).toLocaleString()} บ. / วัน`;
 
-      // วิเคราะห์เมนู
       const topSellingContainer = document.getElementById('top-selling-list');
       const sortedSelling = Object.entries(menuSalesCount).sort((a, b) => b[1] - a[1]);
       topSellingContainer.innerHTML = sortedSelling.length > 0 
