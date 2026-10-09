@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>เก่งตามสั่ง - บัญชี สต๊อก & วิเคราะห์ยอดขาย AI</title>
+  <title>เก่งตามสั่ง - บัญชี สต๊อก & Realtime AI Chat</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <style>
@@ -49,7 +49,7 @@
         <i class="fa-solid fa-utensils"></i> เก่งตามสั่ง - สต๊อก & กำไร
       </h1>
       <span class="text-xs bg-indigo-100 text-indigo-700 px-2.5 py-1 rounded-full font-semibold flex items-center gap-1">
-        <i class="fa-solid fa-robot"></i> v16.0 AI ⚡
+        <i class="fa-solid fa-robot"></i> v16.0 Realtime AI ⚡
       </span>
     </header>
 
@@ -80,7 +80,6 @@
           <span id="rt-today-orders" class="text-[10px] bg-white/20 backdrop-blur-md px-2 py-0.5 rounded-full font-medium">0 รายการวันนี้</span>
         </div>
 
-        <!-- การ์ดสรุป 3 ช่วงเวลาหลัก -->
         <div class="grid grid-cols-3 gap-2 text-center">
           <div class="bg-white/10 backdrop-blur-md p-2 rounded-lg border border-white/15">
             <p class="text-[10px] opacity-80">วันนี้</p>
@@ -96,7 +95,6 @@
           </div>
         </div>
 
-        <!-- 🔍 ส่วนค้นหาย้อนหลังแบบกำหนดวันเอง -->
         <div class="bg-white/10 backdrop-blur-md p-2.5 rounded-lg border border-white/20 space-y-2 text-xs">
           <p class="font-bold text-[11px] text-yellow-200 flex items-center gap-1">
             <i class="fa-solid fa-calendar-days"></i> เช็คยอดขายย้อนหลังอิสระ (เช่น วันที่ 1-7 หรือเดือนที่แล้ว):
@@ -111,7 +109,6 @@
               <input type="date" id="range-end-date" onchange="calculateCustomRange()" class="w-full bg-white p-1 rounded text-xs font-medium">
             </div>
           </div>
-          <!-- ผลลัพธ์ช่วงเวลาที่เลือก -->
           <div id="custom-range-result" class="bg-white/20 p-2 rounded text-[11px] space-y-1">
             <div class="flex justify-between">
               <span>ยอดขายรวม: <strong id="cr-sales" class="text-yellow-300">฿0</strong></span>
@@ -131,13 +128,11 @@
           <h2 id="form-title" class="text-sm font-bold text-blue-600 flex items-center gap-2">
             <i class="fa-solid fa-pen-to-square"></i> บันทึกรายการ
           </h2>
-          <!-- ปุ่มไมค์ -->
           <button id="mic-btn" onclick="toggleVoiceRecognition()" title="กดเพื่อพูดสั่งงาน" class="w-11 h-11 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 border-2 border-blue-400 flex items-center justify-center transition shadow-sm active:scale-95">
             <i class="fa-solid fa-microphone text-lg"></i>
           </button>
         </div>
 
-        <!-- แถบปุ่มเมนูด่วน -->
         <div id="quick-menu-bar" class="p-2 bg-blue-50 border border-blue-100 rounded-lg space-y-1">
           <p class="text-[11px] font-bold text-blue-800 flex justify-between">
             <span>⚡ รหัสเมนูด่วน (พูดเลขหรือกดปุ่มได้เลย):</span>
@@ -204,7 +199,6 @@
 
       <!-- Section หลังบ้าน -->
       <section id="cost-section" class="space-y-4 hidden">
-        <!-- วิเคราะห์อันดับเมนู -->
         <div id="analytics-section" class="bg-white p-4 rounded-xl border border-gray-200 space-y-3 shadow-sm">
           <h2 class="text-sm font-bold text-gray-800 flex items-center gap-2">
             <i class="fa-solid fa-ranking-star text-amber-500"></i> วิเคราะห์อันดับเมนู
@@ -221,7 +215,6 @@
           </div>
         </div>
 
-        <!-- Dashboard สรุปผลประกอบการ -->
         <div id="dashboard-section" class="bg-emerald-50 p-4 rounded-xl border border-emerald-200 space-y-3 shadow-sm">
           <div class="flex justify-between items-center">
             <h2 class="text-sm font-bold text-emerald-900 flex items-center gap-2">
@@ -262,7 +255,6 @@
           </div>
         </div>
 
-        <!-- ตั้งค่าราคาขาย & ต้นทุนอาหาร -->
         <div class="bg-white p-4 rounded-xl border border-gray-200 space-y-4 shadow-sm">
           <h2 class="text-sm font-bold text-blue-600 flex items-center gap-2">
             <i class="fa-solid fa-gear"></i> ตั้งค่าราคาขาย, ต้นทุน & รหัสเมนูด่วน
@@ -347,69 +339,65 @@
 
     </main>
 
-    <!-- 🤖 Floating AI Assistant Button (ปุ่มลอย AI) -->
+    <!-- 🤖 Floating Realtime AI Chat Button -->
     <button onclick="toggleAIModal()" class="fixed bottom-5 right-5 w-14 h-14 bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 text-white rounded-full flex items-center justify-center shadow-xl active:scale-95 transition-all z-50 ai-btn-glow">
       <i class="fa-solid fa-robot text-2xl"></i>
     </button>
 
-    <!-- Modal AI Assistant (หน้าต่างวิเคราะห์การเงินและที่ปรึกษาร้าน) -->
-    <div id="ai-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
-      <div class="bg-white w-full max-w-sm rounded-2xl p-4 shadow-2xl space-y-3 max-h-[85vh] flex flex-col">
+    <!-- Modal Realtime AI Chat Window -->
+    <div id="ai-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-3">
+      <div class="bg-white w-full max-w-sm rounded-2xl p-4 shadow-2xl space-y-3 max-h-[90vh] flex flex-col">
         
-        <!-- Modal Header -->
-        <div class="flex justify-between items-center border-b pb-2.5">
+        <!-- Header -->
+        <div class="flex justify-between items-center border-b pb-2">
           <div class="flex items-center gap-2">
             <div class="w-8 h-8 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white flex items-center justify-center text-sm font-bold shadow">
               <i class="fa-solid fa-brain"></i>
             </div>
             <div>
-              <h3 class="font-bold text-gray-800 text-sm">AI ที่ปรึกษาบัญชีร้าน</h3>
-              <p class="text-[10px] text-gray-500">วิเคราะห์ข้อมูลสดจากบัญชี & สต๊อก</p>
+              <h3 class="font-bold text-gray-800 text-sm">Gemini AI ที่ปรึกษาร้าน (Realtime)</h3>
+              <p class="text-[10px] text-gray-500">ถาม-ตอบ สดจากบัญชี & สต๊อกในเครื่อง</p>
             </div>
           </div>
           <button onclick="toggleAIModal()" class="text-gray-400 hover:text-gray-700 font-bold text-xl px-1">&times;</button>
         </div>
 
-        <!-- AI Insight Screen -->
-        <div class="flex-1 overflow-y-auto space-y-3 pr-1 text-xs">
-          <div class="bg-indigo-50 border border-indigo-100 p-3 rounded-xl space-y-1">
-            <p class="font-bold text-indigo-900 flex items-center gap-1">
-              <i class="fa-solid fa-wand-magic-sparkles text-indigo-600"></i> สถานะสุขภาพการเงินร้านปัจจุบัน:
-            </p>
-            <p id="ai-health-status" class="text-gray-700 leading-relaxed text-[11px]">
-              กดปุ่มด้านล่างเพื่อให้ AI รวบรวมข้อมูลรายการขายและสต๊อกมาประมวลผลทันที
-            </p>
+        <!-- API Key Config Section -->
+        <div id="api-key-container" class="bg-purple-50 p-2.5 rounded-xl border border-purple-100 space-y-1.5 text-xs">
+          <div class="flex justify-between items-center">
+            <span class="font-bold text-purple-900 text-[11px]"><i class="fa-solid fa-key mr-1"></i> Gemini API Key (กรอกฟรีครั้งเดียว):</span>
+            <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-[10px] text-purple-600 underline">ขอ Key ฟรี</a>
           </div>
-
-          <!-- กล่องคำแนะนำด่วน -->
-          <div class="space-y-2">
-            <p class="font-bold text-gray-700 text-[11px] flex items-center gap-1">
-              <i class="fa-solid fa-lightbulb text-amber-500"></i> หัวข้อวิเคราะห์ฉลาด:
-            </p>
-            <div class="grid grid-cols-1 gap-1.5">
-              <button onclick="runAIAnalysis('sales')" class="w-full text-left bg-white hover:bg-purple-50 border border-gray-200 p-2.5 rounded-xl flex items-center justify-between text-[11px] text-gray-800 shadow-sm transition">
-                <span>📈 พยากรณ์ยอดขาย & วิเคราะห์เมนูทำเงิน</span>
-                <i class="fa-solid fa-chevron-right text-gray-400"></i>
-              </button>
-              <button onclick="runAIAnalysis('cost')" class="w-full text-left bg-white hover:bg-purple-50 border border-gray-200 p-2.5 rounded-xl flex items-center justify-between text-[11px] text-gray-800 shadow-sm transition">
-                <span>⚠️ ตรวจสอบจุดเสี่ยงต้นทุน & รายจ่ายสูง</span>
-                <i class="fa-solid fa-chevron-right text-gray-400"></i>
-              </button>
-              <button onclick="runAIAnalysis('stock')" class="w-full text-left bg-white hover:bg-purple-50 border border-gray-200 p-2.5 rounded-xl flex items-center justify-between text-[11px] text-gray-800 shadow-sm transition">
-                <span>📦 วางแผนสั่งซื้อวัตถุดิบและตัดสต๊อก</span>
-                <i class="fa-solid fa-chevron-right text-gray-400"></i>
-              </button>
-            </div>
+          <div class="flex gap-1">
+            <input type="password" id="gemini-api-key" placeholder="วาง API Key ที่นี่ (AIzaSy...)" class="flex-1 bg-white border border-purple-200 p-1.5 rounded text-xs">
+            <button onclick="saveApiKey()" class="bg-purple-600 text-white px-2.5 py-1 rounded font-bold hover:bg-purple-700 text-xs shrink-0">บันทึก</button>
           </div>
-
-          <!-- แสดงผลคำวิเคราะห์ -->
-          <div id="ai-result-box" class="hidden bg-gray-50 p-3 rounded-xl border border-gray-200 text-[11px] text-gray-800 space-y-2 leading-relaxed"></div>
         </div>
 
-        <!-- Modal Footer -->
-        <button onclick="runAIAnalysis('full')" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-md active:scale-95 transition flex items-center justify-center gap-2">
-          <i class="fa-solid fa-bolt"></i> วิเคราะห์ภาพรวมร้านทั้งหมด (Realtime)
-        </button>
+        <!-- Quick Prompts Buttons -->
+        <div class="flex gap-1 overflow-x-auto pb-1 text-[11px]">
+          <button onclick="sendQuickPrompt('วิเคราะห์สุขภาพการเงินและกำไรสุทธิของร้านให้หน่อย')" class="bg-gray-100 hover:bg-purple-100 text-gray-700 border border-gray-200 px-2 py-1 rounded-lg shrink-0">📈 สรุปสุขภาพการเงิน</button>
+          <button onclick="sendQuickPrompt('มีวัตถุดิบตัวไหนใกล้หมดและต้องสั่งซื้อเพิ่มเท่าไหร่')" class="bg-gray-100 hover:bg-purple-100 text-gray-700 border border-gray-200 px-2 py-1 rounded-lg shrink-0">📦 เช็คสต๊อกใกล้หมด</button>
+          <button onclick="sendQuickPrompt('ช่วยแนะนำวิธีเพิ่มยอดขายจากรายการอาหารที่มีหน่อย')" class="bg-gray-100 hover:bg-purple-100 text-gray-700 border border-gray-200 px-2 py-1 rounded-lg shrink-0">💡 ไอเดียเพิ่มยอดขาย</button>
+        </div>
+
+        <!-- Chat History Screen -->
+        <div id="ai-chat-history" class="flex-1 overflow-y-auto space-y-2.5 p-2 bg-gray-50 rounded-xl border border-gray-200 min-h-[220px] max-h-[320px] text-xs">
+          <div class="bg-white p-2.5 rounded-xl border border-gray-200 shadow-sm text-gray-700 space-y-1">
+            <p class="font-bold text-purple-700 flex items-center gap-1">
+              <i class="fa-solid fa-robot"></i> AI ที่ปรึกษาพร้อมทำงานแล้ว!
+            </p>
+            <p class="text-[11px] text-gray-600">สวัสดีครับ! ผมสามารถอ่านข้อมูลยอดขาย รายจ่าย และวัตถุดิบของร้านคุณแบบ Realtime พิมพ์ถามข้อสงสัยได้เลยครับ</p>
+          </div>
+        </div>
+
+        <!-- Chat Input Form -->
+        <div class="flex gap-1.5 pt-1">
+          <input type="text" id="ai-user-input" placeholder="พิมพ์ถาม AI เกี่ยวกับบัญชี/ร้าน..." onkeypress="if(event.key==='Enter') sendChatMessage()" class="flex-1 bg-white border border-gray-300 p-2 rounded-xl text-xs focus:outline-none focus:border-purple-500">
+          <button onclick="sendChatMessage()" id="ai-send-btn" class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-3 py-2 rounded-xl text-xs font-bold shadow hover:opacity-90 active:scale-95 shrink-0">
+            <i class="fa-solid fa-paper-plane"></i>
+          </button>
+        </div>
 
       </div>
     </div>
@@ -478,47 +466,134 @@
       renderData();
     }
 
-    // 🤖 ระบบ AI Assistant
+    // 🤖 ระบบ Gemini API Key Management
+    let userApiKey = localStorage.getItem('keng_gemini_api_key') || '';
+    if (userApiKey) {
+      document.getElementById('gemini-api-key').value = userApiKey;
+    }
+
+    function saveApiKey() {
+      const keyVal = document.getElementById('gemini-api-key').value.trim();
+      if (!keyVal) return alert('กรุณากรอก API Key');
+      localStorage.setItem('keng_gemini_api_key', keyVal);
+      userApiKey = keyVal;
+      alert('บันทึก Gemini API Key เรียบร้อยแล้ว! พร้อมใช้งาน AI');
+    }
+
     function toggleAIModal() {
       const modal = document.getElementById('ai-modal');
       modal.classList.toggle('hidden');
     }
 
-    function runAIAnalysis(mode) {
-      const resultBox = document.getElementById('ai-result-box');
-      const healthStatus = document.getElementById('ai-health-status');
-      resultBox.classList.remove('hidden');
-      resultBox.innerHTML = `<p class="text-purple-600 font-bold animate-pulse"><i class="fa-solid fa-spinner fa-spin mr-1"></i> AI กำลังประมวลผลข้อมูลบัญชีร้านของคุณ...</p>`;
+    function sendQuickPrompt(promptText) {
+      document.getElementById('ai-user-input').value = promptText;
+      sendChatMessage();
+    }
 
-      setTimeout(() => {
-        let incomeTotal = storeData.records.filter(r => r.type === 'income').reduce((acc, r) => acc + r.total, 0);
-        let expenseTotal = storeData.records.filter(r => r.type === 'expense').reduce((acc, r) => acc + r.total, 0);
-        let netProfit = incomeTotal - expenseTotal;
-        let margin = incomeTotal > 0 ? ((netProfit / incomeTotal) * 100).toFixed(1) : 0;
-        let lowStockCount = storeData.inventory.filter(i => (i.qty || 0) <= (i.alertThreshold || 1.0)).length;
+    async function sendChatMessage() {
+      const inputEl = document.getElementById('ai-user-input');
+      const userText = inputEl.value.trim();
+      if (!userText) return;
 
-        healthStatus.innerHTML = `ยอดขายรวม: <strong>฿${incomeTotal.toLocaleString()}</strong> | กำไรสุทธิ: <strong class="text-emerald-600">฿${netProfit.toLocaleString()}</strong> (${margin}%)`;
+      const chatHistory = document.getElementById('ai-chat-history');
 
-        if (mode === 'sales' || mode === 'full') {
-          resultBox.innerHTML = `
-            <p class="font-bold text-purple-900 border-b pb-1"><i class="fa-solid fa-chart-line text-purple-600"></i> ผลวิเคราะห์ยอดขาย & เมนูทำเงิน:</p>
-            <p>• <strong>อัตรากำไร (Margin):</strong> อยู่ที่ ${margin}% ${margin > 30 ? '🟢 (เกณฑ์ดีมาก)' : '🟡 (ควรควบคุมต้นทุนเพิ่ม)'}</p>
-            <p>• <strong>คำแนะนำ:</strong> ดันเมนูกำไรสูง เช่น กะเพราหมูสับ/ไก่ ร่วมกับเครื่องดื่มเย็น เพื่อเพิ่มยอดขายต่อออเดอร์ให้สูงขึ้น</p>
+      // แสดงข้อความของผู้ใช้
+      chatHistory.innerHTML += `
+        <div class="flex justify-end">
+          <div class="bg-purple-600 text-white p-2 rounded-xl rounded-tr-none max-w-[85%] text-[11px] shadow-sm">
+            ${userText}
+          </div>
+        </div>
+      `;
+
+      inputEl.value = '';
+      chatHistory.scrollTop = chatHistory.scrollHeight;
+
+      // แสดงสถานะ AI กำลังพิมพ์
+      const loadingId = 'ai-loading-' + Date.now();
+      chatHistory.innerHTML += `
+        <div id="${loadingId}" class="flex justify-start">
+          <div class="bg-white border border-gray-200 text-purple-700 p-2 rounded-xl rounded-tl-none text-[11px] shadow-sm animate-pulse flex items-center gap-1.5">
+            <i class="fa-solid fa-spinner fa-spin"></i> AI กำลังอ่านบัญชีและคิดคำตอบ...
+          </div>
+        </div>
+      `;
+      chatHistory.scrollTop = chatHistory.scrollHeight;
+
+      // ตรวจสอบว่ามี API Key หรือยัง
+      const apiKey = userApiKey || document.getElementById('gemini-api-key').value.trim();
+      if (!apiKey) {
+        document.getElementById(loadingId).remove();
+        chatHistory.innerHTML += `
+          <div class="flex justify-start">
+            <div class="bg-rose-50 border border-rose-200 text-rose-700 p-2 rounded-xl rounded-tl-none text-[11px]">
+              ❌ กรุณากรอก Gemini API Key ด้านบนก่อนเริ่มใช้งาน (ขอรับ Key ฟรีได้ที่ลิงก์ด้านบน)
+            </div>
+          </div>
+        `;
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+        return;
+      }
+
+      // ดึงข้อมูลบัญชีสดในเครื่องส่งให้ AI
+      const shopContext = {
+        totalIncome: storeData.records.filter(r => r.type === 'income').reduce((acc, r) => acc + r.total, 0),
+        totalExpense: storeData.records.filter(r => r.type === 'expense').reduce((acc, r) => acc + r.total, 0),
+        menuList: storeData.menuDetails,
+        recentTransactions: storeData.records.slice(-15),
+        inventoryStock: storeData.inventory.map(i => ({ name: i.name, qty: i.qty, unit: i.unit }))
+      };
+
+      const systemPrompt = `
+        คุณเป็นที่ปรึกษาการเงินและผู้เชี่ยวชาญบริหารจัดการร้านอาหารตามสั่งชื่อ "เก่งตามสั่ง"
+        นี่คือข้อมูลสรุปบัญชีและสต๊อกล่าสุดของร้านในขณะนี้: ${JSON.stringify(shopContext)}
+
+        คำถามของผู้ใช้: "${userText}"
+
+        คำแนะนำในการตอบ:
+        1. ตอบเป็นภาษาไทย กระชับ อ่านง่าย เหมาะกับการอ่านบนมือถือ
+        2. นำข้อมูลตัวเลขจริงของร้านมาใช้อ้างอิงประกอบคำตอบเสมอ
+        3. ให้คำแนะนำเชิงบวก เพิ่มยอดขาย หรือประหยัดต้นทุน
+      `;
+
+      try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: systemPrompt }] }]
+          })
+        });
+
+        const data = await response.json();
+        document.getElementById(loadingId).remove();
+
+        if (data.candidates && data.candidates[0].content.parts[0].text) {
+          let aiReply = data.candidates[0].content.parts[0].text;
+          // แปลง markdown ขึ้นบรรทัดใหม่ให้อ่านง่าย
+          aiReply = aiReply.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+          chatHistory.innerHTML += `
+            <div class="flex justify-start">
+              <div class="bg-white border border-purple-100 text-gray-800 p-2.5 rounded-xl rounded-tl-none max-w-[90%] text-[11px] shadow-sm leading-relaxed border-l-4 border-l-purple-600">
+                ${aiReply}
+              </div>
+            </div>
           `;
-        } else if (mode === 'cost') {
-          resultBox.innerHTML = `
-            <p class="font-bold text-purple-900 border-b pb-1"><i class="fa-solid fa-shield-halved text-rose-500"></i> วิเคราะห์จุดเสี่ยงต้นทุน:</p>
-            <p>• <strong>รายจ่ายรวมสะสม:</strong> ฿${expenseTotal.toLocaleString()}</p>
-            <p>• <strong>ข้อควรระวัง:</strong> เช็คราคาหมูกรอบ/เนื้อสัตว์สด สัปดาห์ต่อสัปดาห์ หากต้นทุนเกิน 45% ของราคาขาย แนะนำปรับปริมาณสัดส่วนวัตถุดิบลง 5%</p>
-          `;
-        } else if (mode === 'stock') {
-          resultBox.innerHTML = `
-            <p class="font-bold text-purple-900 border-b pb-1"><i class="fa-solid fa-boxes-stacked text-amber-500"></i> วางแผนสต๊อกวัตถุดิบ:</p>
-            <p>• <strong>วัตถุดิบใกล้หมด:</strong> มีทั้งหมด <span class="text-rose-600 font-bold">${lowStockCount} รายการ</span> ที่ต้องรีบเติม</p>
-            <p>• <strong>คำแนะนำสั่งซื้อ:</strong> ควรสั่งหมูสด ข้าวสาร และกล่องอาหารสำรองล่วงหน้าอย่างน้อย 2 วันก่อนช่วงวันหยุดสุดสัปดาห์</p>
-          `;
+        } else {
+          throw new Error('API Response Error');
         }
-      }, 600);
+      } catch (err) {
+        document.getElementById(loadingId).remove();
+        chatHistory.innerHTML += `
+          <div class="flex justify-start">
+            <div class="bg-rose-50 border border-rose-200 text-rose-700 p-2 rounded-xl rounded-tl-none text-[11px]">
+              ⚠️ ไม่สามารถดึงคำตอบจาก AI ได้ กรุณาตรวจสอบว่ากรอก API Key ถูกต้องหรือไม่
+            </div>
+          </div>
+        `;
+      }
+      chatHistory.scrollTop = chatHistory.scrollHeight;
     }
 
     // 🏷️ ตรวจจับหน่วยนับอัตโนมัติ
