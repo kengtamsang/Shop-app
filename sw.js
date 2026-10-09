@@ -1,5 +1,5 @@
-// อัปเดตเลขเวอร์ชันแคชเพื่อบังคับให้เบราว์เซอร์โหลด index.html ตัวใหม่ล่าสุด
-const CACHE = 'shop-v18';
+// อัปเดตแคชเป็นเวอร์ชัน shop-v19 เพื่อล้างข้อผิดพลาดโมเดลเก่าออก
+const CACHE = 'shop-v19';
 const FILES = [
   './',
   './index.html',
@@ -23,7 +23,7 @@ self.addEventListener('activate', e => {
   );
 });
 
-// ลองโหลดจากเน็ตก่อน (ได้เวอร์ชันล่าสุด) ถ้าออฟไลน์ค่อยดึงจาก Cache
+// ดึงข้อมูลจากเครือข่ายก่อน เพื่อให้ได้เวอร์ชันล่าสุดเสมอ
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
   e.respondWith(
